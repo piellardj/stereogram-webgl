@@ -23,6 +23,43 @@ const data = {
     },
     controlsSections: [
         {
+            title: "Tile",
+            controls: [
+                {
+                    type: Demopage.supportedControls.Tabs,
+                    title: "Mode",
+                    id: "tile-mode-tabs-id",
+                    unique: true,
+                    options: [
+                        {
+                            label: "Texture",
+                            value: "texture",
+                            checked: true,
+                        },
+                        {
+                            label: "Noise",
+                            value: "noise"
+                        },
+                    ]
+                },
+                {
+                    type: Demopage.supportedControls.Range,
+                    title: "Resolution",
+                    id: "tile-noise-resolution-range-id",
+                    min: 8,
+                    max: 64,
+                    value: 16,
+                    step: 1
+                },
+                {
+                    type: Demopage.supportedControls.Checkbox,
+                    title: "Colored",
+                    id: "tile-noise-colored-checkbox-id",
+                    checked: true,
+                },
+            ]
+        },
+        {
             title: "Display",
             controls: [
                 {

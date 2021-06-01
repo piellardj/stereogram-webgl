@@ -38,6 +38,9 @@ function main(): void {
     let needToRedraw = true;
     Parameters.redrawObservers.push(() => { needToRedraw = true; });
 
+    let needToRecomputeNoiseTile = true;
+    Parameters.recomputeNoiseTileObservers.push(() => { needToRecomputeNoiseTile = true; });
+
     function mainLoop(): void {
         if (needToDownload) {
             // redraw before resizing the canvas because the download pane might open, which changes the canvas size
@@ -46,9 +49,13 @@ function main(): void {
             needToDownload = false;
         }
 
+        if (needToRecomputeNoiseTile) {
+            const resolution = Parameters.noiseTileResolution;
+            needToRecomputeNoiseTile = !tile.randomize(resolution, resolution);
+        }
+
         if (needToRedraw) {
             GLCanvas.adjustSize(false);
-            gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
             engine.draw(heightmap, tile);
             needToRedraw = false;
         }
