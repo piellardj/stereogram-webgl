@@ -14,11 +14,6 @@ float heightmap(const vec2 position) {
 }
 
 vec2 originalPosition(vec2 position) {
-    // position.x = fract(position.x * float(uStripesCount));
-    // return position;
-    // float stride = 1.0 / float(uStripesCount);
-
-    // float cumulated = 0.0;
     position *= float(uStripesCount);
     for (int i = 0; i < uStripesCount + 8; i++) {
         if (position.x >= 1.0) {
@@ -27,7 +22,6 @@ vec2 originalPosition(vec2 position) {
     }
     position.y = fract(position.y);
     return position;
-    // return cumulated;
 }
 
 void main(void) {
