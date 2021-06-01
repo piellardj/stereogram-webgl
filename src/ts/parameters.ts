@@ -59,14 +59,19 @@ abstract class Parameters {
     }
 }
 
-Page.Canvas.Observers.canvasResize.push(callRedrawObservers);
-Page.Tabs.addObserver(controlId.TILE_MODE_TABS, () => {
+function updateTileNoiseControlsVisibility(): void {
     const isTileNoiseMode = (Parameters.tileMode === ETileMode.NOISE);
     Page.Controls.setVisibility(controlId.TILE_NOISE_RESOLUTION, isTileNoiseMode);
     Page.Controls.setVisibility(controlId.TILE_NOISE_COLORED, isTileNoiseMode);
+}
 
+Page.Canvas.Observers.canvasResize.push(callRedrawObservers);
+Page.Tabs.addObserver(controlId.TILE_MODE_TABS, () => {
+    updateTileNoiseControlsVisibility();
     callRedrawObservers();
 });
+updateTileNoiseControlsVisibility();
+
 Page.Range.addObserver(controlId.DEPTH_RANGE, callRedrawObservers);
 Page.Checkbox.addObserver(controlId.SHOW_HEIGHTMAP, callRedrawObservers);
 
