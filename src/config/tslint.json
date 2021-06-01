@@ -1,0 +1,66 @@
+{
+    "defaultSeverity": "error",
+    "extends": [
+        "tslint:recommended"
+    ],
+    "jsRules": {},
+    "rules": {
+        "comment-format": [
+            true,
+            "check-space"
+        ],
+        "file-name-casing": [
+            true,
+            "kebab-case"
+        ],
+        "increment-decrement": [
+            true,
+            "allow-post"
+        ],
+        "indent": [
+            true,
+            "spaces",
+            4
+        ],
+        "linebreak-style": [
+            true,
+            "CRLF"
+        ],
+        "no-console": false,
+        "no-default-export": true,
+        "no-string-literal": false,
+        "object-literal-sort-keys": false,
+        "only-arrow-functions": [
+            true,
+            "allow-declarations",
+            "allow-named-functions"
+        ],
+        "prefer-template": [
+            true,
+            "allow-single-concat"
+        ],
+        "semicolon": [
+            true,
+            "always"
+        ],
+        "strict-boolean-expressions": [
+            true,
+            "allow-string",
+            "allow-undefined-union"
+        ],
+        "typedef": [
+            true,
+            "arrow-parameter",
+            "call-signature",
+            "member-variable-declaration",
+            "parameter",
+            "property-declaration"
+        ],
+        "variable-name": [
+            true,
+            "check-format",
+            "allow-leading-underscore"
+        ]
+    },
+    "rulesDirectory": []
+}
