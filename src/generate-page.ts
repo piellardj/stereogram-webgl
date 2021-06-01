@@ -23,6 +23,17 @@ const data = {
     },
     controlsSections: [
         {
+            title: "Display",
+            controls: [
+                {
+                    type: Demopage.supportedControls.Checkbox,
+                    title: "Show heightmap",
+                    id: "show-heightmap-checkbox-id",
+                    checked: false,
+                },
+            ]
+        },
+        {
             title: "Output",
             controls: [
                 {

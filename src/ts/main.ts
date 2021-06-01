@@ -32,7 +32,7 @@ function main(): void {
     Parameters.imageDownloadObservers.push(() => { needToDownload = true; });
 
     let needToRedraw = true;
-    Page.Canvas.Observers.canvasResize.push(() => { needToRedraw = true; });
+    Parameters.redrawObservers.push(() => { needToRedraw = true; });
 
     function mainLoop(): void {
         if (needToDownload) {
@@ -44,7 +44,7 @@ function main(): void {
 
         if (needToRedraw) {
             GLCanvas.adjustSize(false);
-            gl.viewport(0, 0, canvas.width, canvas.height);
+            gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
             engine.draw();
             needToRedraw = false;
         }
