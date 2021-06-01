@@ -4,28 +4,22 @@ import * as ShaderManager from "./gl-utils/shader-manager";
 import { VBO } from "./gl-utils/vbo";
 import { Heightmap } from "./heightmap";
 
-import { ImageTexture } from "./image-texture";
 import * as Loader from "./loader";
 import { Parameters } from "./parameters";
+import { Tile } from "./tile";
 
 
 class Engine {
-    private readonly tileTexture: ImageTexture;
-
     private readonly fullscreenVBO: VBO;
 
     private stereogramShader: Shader;
     private heightmapShader: Shader;
 
     public constructor() {
-        this.tileTexture = new ImageTexture();
-        this.tileTexture.loadFromUrl("resources/tile.png");
-
         this.fullscreenVBO = VBO.createQuad(gl, -1, -1, 1, 1);
 
         this.asyncLoadShader("stereomap", "fullscreen.vert", "stereogram.frag", (shader: Shader) => {
             this.stereogramShader = shader;
-            this.stereogramShader.u["uTileTexture"].value = this.tileTexture.id;
         });
 
         this.asyncLoadShader("heightmap", "fullscreen.vert", "heightmap.frag", (shader: Shader) => {
@@ -33,12 +27,13 @@ class Engine {
         });
     }
 
-    public draw(heightmap: Heightmap): void {
+    public draw(heightmap: Heightmap, tile: Tile): void {
         let shader: Shader;
         if (Parameters.showHeightmap) {
             shader = this.heightmapShader;
         } else {
             if (this.stereogramShader) {
+                this.stereogramShader.u["uTileTexture"].value = tile.id;
                 this.stereogramShader.u["uDepthFactor"].value = Parameters.depth;
                 shader = this.stereogramShader;
             }
