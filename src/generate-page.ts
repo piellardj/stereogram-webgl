@@ -26,6 +26,15 @@ const data = {
             title: "Display",
             controls: [
                 {
+                    type: Demopage.supportedControls.Range,
+                    title: "Depth",
+                    id: "depth-range-id",
+                    min: 0,
+                    max: 1,
+                    value: 0.75,
+                    step: 0.01
+                },
+                {
                     type: Demopage.supportedControls.Checkbox,
                     title: "Show heightmap",
                     id: "show-heightmap-checkbox-id",

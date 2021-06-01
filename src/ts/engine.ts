@@ -43,7 +43,10 @@ class Engine {
         if (Parameters.showHeightmap) {
             shader = this.heightmapShader;
         } else {
-            shader = this.stereogramShader;
+            if (this.stereogramShader) {
+                this.stereogramShader.u["uDepthFactor"].value = Parameters.depth;
+                shader = this.stereogramShader;
+            }
         }
 
         if (shader) {

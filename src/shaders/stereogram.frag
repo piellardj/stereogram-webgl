@@ -3,12 +3,14 @@ precision mediump float;
 uniform sampler2D uTileTexture;
 uniform sampler2D uHeightmapTexture;
 
-const int uStripesCount = 8;
+uniform float uDepthFactor;
+
+const int uStripesCount = 16;
 
 varying vec2 vPosition;
 
 float heightmap(const vec2 position) {
-    return 1.0 - texture2D(uHeightmapTexture, position * vec2(1,-1) + vec2(0,1)).r;
+    return uDepthFactor * (1.0 - texture2D(uHeightmapTexture, position * vec2(1,-1) + vec2(0,1)).r);
 }
 
 vec2 originalPosition(vec2 position) {
@@ -18,9 +20,9 @@ vec2 originalPosition(vec2 position) {
 
     // float cumulated = 0.0;
     position *= float(uStripesCount);
-    for (int i = 0; i < uStripesCount + 2; i++) {
+    for (int i = 0; i < uStripesCount + 8; i++) {
         if (position.x >= 1.0) {
-            position.x -= 1.0 - heightmap(position / float(uStripesCount)) * 0.3;
+            position.x -= 1.0 - heightmap(position / float(uStripesCount)) * 0.45;
         }
     }
     position.y = fract(position.y);
