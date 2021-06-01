@@ -21,7 +21,18 @@ const data = {
         height: 512,
         enableFullscreen: true
     },
-    controlsSections: []
+    controlsSections: [
+        {
+            title: "Output",
+            controls: [
+                {
+                    type: Demopage.supportedControls.FileDownload,
+                    id: "image-download-id",
+                    label: "Download image"
+                }
+            ]
+        }
+    ]
 };
 
 const SRC_DIR = path.resolve(__dirname);

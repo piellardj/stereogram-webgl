@@ -2,18 +2,25 @@ import "./page-interface-generated";
 
 
 /* === IDs ============================================================ */
-// const controlId = {};
+const controlId = {
+    IMAGE_DOWNLOAD: "image-download-id",
+};
 
-// type Observer = () => unknown;
+type Observer = () => unknown;
 
-// function callObservers(observers: Observer[]): void {
-//     for (const observer of observers) {
-//         observer();
-//     }
-// }
+function callObservers(observers: Observer[]): void {
+    for (const observer of observers) {
+        observer();
+    }
+}
 
 abstract class Parameters {
+    public static imageDownloadObservers: Observer[] = [];
 }
+
+Page.FileControl.addDownloadObserver(controlId.IMAGE_DOWNLOAD, () => {
+    callObservers(Parameters.imageDownloadObservers);
+});
 
 export {
     Parameters,
