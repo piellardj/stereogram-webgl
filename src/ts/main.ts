@@ -6,6 +6,7 @@ import { gl } from "./gl-utils/gl-canvas";
 import { Parameters } from "./parameters";
 
 import "./page-interface-generated";
+import { Heightmap } from "./heightmap";
 
 
 function main(): void {
@@ -27,6 +28,7 @@ function main(): void {
     const canvas = Page.Canvas.getCanvas();
 
     const engine = new Engine();
+    const heightmap = new Heightmap();
 
     let needToDownload = false;
     Parameters.imageDownloadObservers.push(() => { needToDownload = true; });
@@ -37,7 +39,7 @@ function main(): void {
     function mainLoop(): void {
         if (needToDownload) {
             // redraw before resizing the canvas because the download pane might open, which changes the canvas size
-            engine.draw(); // redraw because preserveDrawingBuffer is false
+            engine.draw(heightmap); // redraw because preserveDrawingBuffer is false
             download(canvas);
             needToDownload = false;
         }
@@ -45,7 +47,7 @@ function main(): void {
         if (needToRedraw) {
             GLCanvas.adjustSize(false);
             gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-            engine.draw();
+            engine.draw(heightmap);
             needToRedraw = false;
         }
 
