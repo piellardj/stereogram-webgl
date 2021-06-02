@@ -9,6 +9,7 @@ const controlId = {
     SHOW_UV: "show-uv-checkbox-id",
     TILE_UPLOAD_BUTTON: "input-tile-upload-button",
 
+    HEIGHTMAP_MODE_TABS: "heightmap-mode-tabs-id",
     DEPTH_RANGE: "depth-range-id",
     HEIGHTMAP_INVERT_CHECKBOX: "invert-heightmap-checkbox-id",
     SHOW_HEIGHTMAP: "show-heightmap-checkbox-id",
@@ -40,6 +41,11 @@ enum ETileMode {
     NOISE = "noise",
 }
 
+enum EHeightmapMode {
+    STILL = "still",
+    MOVING = "moving",
+}
+
 abstract class Parameters {
     public static readonly tileUploadObservers: ImageUploadObserver[] = [];
     public static readonly redrawObservers: Observer[] = [];
@@ -62,6 +68,9 @@ abstract class Parameters {
         return Page.Checkbox.isChecked(controlId.SHOW_UV);
     }
 
+    public static get heightmapMode(): EHeightmapMode {
+        return Page.Tabs.getValues(controlId.HEIGHTMAP_MODE_TABS)[0] as EHeightmapMode;
+    }
     public static get depth(): number {
         return Page.Range.getValue(controlId.DEPTH_RANGE);
     }
@@ -78,10 +87,18 @@ function updateTileNoiseControlsVisibility(): void {
     Page.Controls.setVisibility(controlId.TILE_NOISE_RESOLUTION, isTileNoiseMode);
     Page.Controls.setVisibility(controlId.TILE_NOISE_COLORED, isTileNoiseMode);
     Page.Controls.setVisibility(controlId.TILE_UPLOAD_BUTTON, !isTileNoiseMode);
+
+    const isMovingMode = (Parameters.heightmapMode === EHeightmapMode.MOVING);
+    Page.Controls.setVisibility(controlId.HEIGHTMAP_UPLOAD_BUTTON, !isMovingMode);
 }
 
 Page.Canvas.Observers.canvasResize.push(callRedrawObservers);
+
 Page.Tabs.addObserver(controlId.TILE_MODE_TABS, () => {
+    updateTileNoiseControlsVisibility();
+    callRedrawObservers();
+});
+Page.Tabs.addObserver(controlId.HEIGHTMAP_MODE_TABS, () => {
     updateTileNoiseControlsVisibility();
     callRedrawObservers();
 });
@@ -109,6 +126,7 @@ function imageUploadObserver(observers: ImageUploadObserver[]): (filesList: File
 Page.FileControl.addUploadObserver(controlId.TILE_UPLOAD_BUTTON, imageUploadObserver(Parameters.tileUploadObservers));
 Page.FileControl.addUploadObserver(controlId.HEIGHTMAP_UPLOAD_BUTTON, imageUploadObserver(Parameters.heightmapUploadObservers));
 
+Page.Tabs.addObserver(controlId.HEIGHTMAP_MODE_TABS, callRedrawObservers);
 Page.Range.addObserver(controlId.DEPTH_RANGE, callRedrawObservers);
 Page.Checkbox.addObserver(controlId.HEIGHTMAP_INVERT_CHECKBOX, callRedrawObservers);
 Page.Checkbox.addObserver(controlId.SHOW_HEIGHTMAP, callRedrawObservers);
@@ -122,6 +140,7 @@ Page.FileControl.addDownloadObserver(controlId.IMAGE_DOWNLOAD, () => {
 });
 
 export {
+    EHeightmapMode,
     ETileMode,
     Parameters,
 };

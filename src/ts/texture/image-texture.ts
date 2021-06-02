@@ -1,11 +1,12 @@
-import { gl } from "./gl-utils/gl-canvas";
-import * as Loader from "./loader";
-import { createImageData } from "./utils";
+import { gl } from "../gl-utils/gl-canvas";
+import * as Loader from "../loader";
+import { createImageData } from "../utils";
+import { IAsyncTexture } from "./i-texture";
 
 
 const defaultImageData = createImageData(1, 1, new Uint8ClampedArray([0, 0, 0, 0]));
 
-class ImageTexture {
+class ImageTexture implements IAsyncTexture {
     public readonly id: WebGLTexture;
     private _loaded: boolean;
     private _width: number = -1;

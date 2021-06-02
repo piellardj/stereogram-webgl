@@ -13,6 +13,7 @@ const data = {
     additionalLinks: [],
     styleFiles: [],
     scriptFiles: [
+        "script/gl-matrix-2.5.1-min.js",
         "script/main.min.js"
     ],
     indicators: [],
@@ -74,6 +75,23 @@ const data = {
         {
             title: "Heightmap",
             controls: [
+                {
+                    type: Demopage.supportedControls.Tabs,
+                    title: "Mode",
+                    id: "heightmap-mode-tabs-id",
+                    unique: true,
+                    options: [
+                        {
+                            label: "Still",
+                            value: "still",
+                            checked: true,
+                        },
+                        {
+                            label: "Moving",
+                            value: "moving",
+                        },
+                    ]
+                },
                 {
                     type: Demopage.supportedControls.Range,
                     title: "Depth",

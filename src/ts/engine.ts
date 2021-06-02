@@ -59,6 +59,8 @@ class Engine {
         if (shader) {
             gl.bindFramebuffer(gl.FRAMEBUFFER, null);
             gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT); // tslint:disable-line:no-bitwise
+
             shader.u["uHeightmapTexture"].value = heightmapTexture.id;
             shader.u["uInvertHeightmap"].value = Parameters.invertHeightmap;
             shader.u["uDepthFactor"].value = Parameters.depth;

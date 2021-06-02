@@ -1,5 +1,5 @@
 import { ETileMode, Parameters } from "./parameters";
-import { ImageTexture } from "./image-texture";
+import { ImageTexture } from "./texture/image-texture";
 import { createImageData } from "./utils";
 
 class Tile {

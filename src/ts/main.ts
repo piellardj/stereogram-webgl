@@ -3,7 +3,7 @@ import { Engine } from "./engine";
 import * as GLCanvas from "./gl-utils/gl-canvas";
 import { gl } from "./gl-utils/gl-canvas";
 
-import { Parameters } from "./parameters";
+import { EHeightmapMode, ETileMode, Parameters } from "./parameters";
 
 import "./page-interface-generated";
 import { Heightmap } from "./heightmap";
@@ -23,7 +23,7 @@ function main(): void {
     }
     gl.disable(gl.CULL_FACE);
     gl.disable(gl.BLEND);
-    gl.disable(gl.DEPTH_TEST);
+    gl.enable(gl.DEPTH_TEST);
     gl.disable(gl.STENCIL_TEST);
 
     const canvas = Page.Canvas.getCanvas();
@@ -49,7 +49,12 @@ function main(): void {
             needToDownload = false;
         }
 
-        if (needToRecomputeNoiseTile) {
+        if (Parameters.heightmapMode === EHeightmapMode.MOVING) {
+            needToRecomputeNoiseTile = true;
+            needToRedraw = true;
+        }
+
+        if (needToRecomputeNoiseTile && Parameters.tileMode === ETileMode.NOISE) {
             const resolution = Parameters.noiseTileResolution;
             needToRecomputeNoiseTile = !tile.randomize(resolution, resolution);
         }
