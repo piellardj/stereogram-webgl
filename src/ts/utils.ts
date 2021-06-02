@@ -21,6 +21,33 @@ function asyncLoadShader(name: string, vertexFilename: string, fragmentFilename:
     });
 }
 
+let hiddenCanvas: HTMLCanvasElement;
+let hiddenCanvasContext: CanvasRenderingContext2D;
+
+function createImageData(width: number, height: number, data: Uint8ClampedArray): ImageData {
+    if (data.length !== width * height * 4) {
+        throw new Error(`Incoherent image data: width=${width} height=${height} data.length=${data.length}`);
+    }
+
+    try {
+        return new ImageData(data, width, height);
+    } catch {
+        console.log("Failed to create default ImageData from constructor, using Canvas2D instead...");
+
+        if (!hiddenCanvas) {
+            hiddenCanvas = document.createElement("canvas");
+            hiddenCanvasContext = hiddenCanvas.getContext("2d");
+        }
+
+        const result = hiddenCanvasContext.createImageData(width, height);
+        for (let i = 0; i < result.data.length; i++) {
+            result.data[i] = data[i];
+        }
+        return result;
+    }
+}
+
 export {
     asyncLoadShader,
+    createImageData,
 };
