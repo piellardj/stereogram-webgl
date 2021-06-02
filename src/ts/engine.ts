@@ -41,7 +41,7 @@ class Engine {
             if (this.stereogramShader) {
                 const tileWidthInPixel = gl.canvas.width / (this.stripesCount + 1);
                 const tileHeightInPixel = tileWidthInPixel / tile.aspectRatio;
-                const tileHeight = gl.canvas.height / tileHeightInPixel;
+                const tileHeight = tileHeightInPixel / gl.canvas.height;
 
                 this.stereogramShader.u["uTileTexture"].value = tile.id;
                 this.stereogramShader.u["uDepthFactor"].value = Parameters.depth;

@@ -29,7 +29,7 @@ vec2 originalPosition(vec2 position) {
             position.x -= 1.0 - heightmap(previousPosition) * 0.45;
         }
     }
-    position.y = fract(uTileHeight * position.y);
+    position.y = fract(position.y / uTileHeight);
     return position;
 }
 
