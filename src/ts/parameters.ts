@@ -10,6 +10,7 @@ const controlId = {
     TILE_UPLOAD_BUTTON: "input-tile-upload-button",
 
     HEIGHTMAP_MODE_TABS: "heightmap-mode-tabs-id",
+    MODEL_PRESET_SELECT: "model-preset-select-id",
     DEPTH_RANGE: "depth-range-id",
     HEIGHTMAP_INVERT_CHECKBOX: "invert-heightmap-checkbox-id",
     SHOW_HEIGHTMAP: "show-heightmap-checkbox-id",
@@ -71,6 +72,9 @@ abstract class Parameters {
     public static get heightmapMode(): EHeightmapMode {
         return Page.Tabs.getValues(controlId.HEIGHTMAP_MODE_TABS)[0] as EHeightmapMode;
     }
+    public static get modelId(): string {
+        return Page.Select.getValue(controlId.MODEL_PRESET_SELECT);
+    }
     public static get depth(): number {
         return Page.Range.getValue(controlId.DEPTH_RANGE);
     }
@@ -90,6 +94,7 @@ function updateTileNoiseControlsVisibility(): void {
 
     const isMovingMode = (Parameters.heightmapMode === EHeightmapMode.MOVING);
     Page.Controls.setVisibility(controlId.HEIGHTMAP_UPLOAD_BUTTON, !isMovingMode);
+    Page.Controls.setVisibility(controlId.MODEL_PRESET_SELECT, isMovingMode);
 }
 
 Page.Canvas.Observers.canvasResize.push(callRedrawObservers);

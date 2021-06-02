@@ -93,6 +93,23 @@ const data = {
                     ]
                 },
                 {
+                    type: Demopage.supportedControls.Select,
+                    title: "Preset",
+                    id: "model-preset-select-id",
+                    placeholder: "Custom",
+                    options: [
+                        {
+                            value: "cube",
+                            label: "Cube",
+                            checked: true,
+                        },
+                        {
+                            value: "monkey",
+                            label: "Monkey",
+                        }
+                    ]
+                },
+                {
                     type: Demopage.supportedControls.Range,
                     title: "Depth",
                     id: "depth-range-id",
