@@ -18,20 +18,12 @@ class Tile {
         this.randomTexture = new ImageTexture();
     }
 
-    public get id(): WebGLTexture {
+    public get current(): ImageTexture {
         if (Parameters.tileMode === ETileMode.TEXTURE) {
-            return this.tileTexture.id;
+            return this.tileTexture;
         } else {
-            return this.randomTexture.id;
+            return this.randomTexture;
         }
-    }
-
-    public get loaded(): boolean {
-        return this.tileTexture.loaded;
-    }
-
-    public get aspectRatio(): number {
-        return this.tileTexture.width / this.tileTexture.height;
     }
 
     public randomize(width: number, height: number): boolean {

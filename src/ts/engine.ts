@@ -34,16 +34,19 @@ class Engine {
     }
 
     public draw(heightmap: Heightmap, tile: Tile): boolean {
+        const tileTexture = tile.current;
+
         let shader: Shader;
         if (Parameters.showHeightmap) {
             shader = this.heightmapShader;
         } else {
             if (this.stereogramShader) {
+
                 const tileWidthInPixel = gl.canvas.width / (this.stripesCount + 1);
-                const tileHeightInPixel = tileWidthInPixel / tile.aspectRatio;
+                const tileHeightInPixel = tileWidthInPixel / (tileTexture.width / tileTexture.height);
                 const tileHeight = tileHeightInPixel / gl.canvas.height;
 
-                this.stereogramShader.u["uTileTexture"].value = tile.id;
+                this.stereogramShader.u["uTileTexture"].value = tileTexture.id;
                 this.stereogramShader.u["uDepthFactor"].value = Parameters.depth;
                 this.stereogramShader.u["uTileColor"].value = (Parameters.tileMode === ETileMode.NOISE && !Parameters.noiseTileColored) ? 0 : 1;
                 this.stereogramShader.u["uTileHeight"].value = tileHeight;
@@ -62,7 +65,7 @@ class Engine {
             shader.bindUniformsAndAttributes();
             gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
-            return heightmap.loaded && tile.loaded;
+            return heightmap.loaded && tileTexture.loaded;
         }
 
         return false;
