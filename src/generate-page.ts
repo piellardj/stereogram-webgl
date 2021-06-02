@@ -67,7 +67,7 @@ const data = {
                     type: Demopage.supportedControls.FileUpload,
                     id: "input-tile-upload-button",
                     accept: [".png", ".jpg", ".bmp", ".webp"],
-                    defaultMessage: "Upload"
+                    defaultMessage: "Upload a pattern"
                 },
             ]
         },
@@ -94,6 +94,12 @@ const data = {
                     title: "Show heightmap",
                     id: "show-heightmap-checkbox-id",
                     checked: false,
+                },
+                {
+                    type: Demopage.supportedControls.FileUpload,
+                    id: "input-heightmap-upload-button",
+                    accept: [".png", ".jpg", ".bmp", ".webp"],
+                    defaultMessage: "Upload a heightmap"
                 },
             ]
         },

@@ -12,6 +12,7 @@ const controlId = {
     DEPTH_RANGE: "depth-range-id",
     HEIGHTMAP_INVERT_CHECKBOX: "invert-heightmap-checkbox-id",
     SHOW_HEIGHTMAP: "show-heightmap-checkbox-id",
+    HEIGHTMAP_UPLOAD_BUTTON: "input-heightmap-upload-button",
 
     IMAGE_DOWNLOAD: "image-download-id",
 };
@@ -43,6 +44,9 @@ abstract class Parameters {
     public static readonly tileUploadObservers: ImageUploadObserver[] = [];
     public static readonly redrawObservers: Observer[] = [];
     public static readonly recomputeNoiseTileObservers: Observer[] = [];
+
+    public static readonly heightmapUploadObservers: ImageUploadObserver[] = [];
+
     public static readonly imageDownloadObservers: Observer[] = [];
 
     public static get tileMode(): ETileMode {
@@ -83,22 +87,27 @@ Page.Tabs.addObserver(controlId.TILE_MODE_TABS, () => {
 });
 updateTileNoiseControlsVisibility();
 
-Page.FileControl.addUploadObserver(controlId.TILE_UPLOAD_BUTTON, (filesList: FileList) => {
-    if (filesList.length === 1) {
-        const reader = new FileReader();
-        reader.onload = () => {
-            const image = new Image();
-            image.addEventListener("load", () => {
-                for (const observer of Parameters.tileUploadObservers) {
-                    observer(image);
-                }
-                callRedrawObservers();
-            });
-            image.src = reader.result as string;
-        };
-        reader.readAsDataURL(filesList[0]);
-    }
-});
+function imageUploadObserver(observers: ImageUploadObserver[]): (filesList: FileList) => unknown {
+    return (filesList: FileList) => {
+        if (filesList.length === 1) {
+            const reader = new FileReader();
+            reader.onload = () => {
+                const image = new Image();
+                image.addEventListener("load", () => {
+                    for (const observer of observers) {
+                        observer(image);
+                    }
+                    callRedrawObservers();
+                });
+                image.src = reader.result as string;
+            };
+            reader.readAsDataURL(filesList[0]);
+        }
+    };
+}
+
+Page.FileControl.addUploadObserver(controlId.TILE_UPLOAD_BUTTON, imageUploadObserver(Parameters.tileUploadObservers));
+Page.FileControl.addUploadObserver(controlId.HEIGHTMAP_UPLOAD_BUTTON, imageUploadObserver(Parameters.heightmapUploadObservers));
 
 Page.Range.addObserver(controlId.DEPTH_RANGE, callRedrawObservers);
 Page.Checkbox.addObserver(controlId.HEIGHTMAP_INVERT_CHECKBOX, callRedrawObservers);
