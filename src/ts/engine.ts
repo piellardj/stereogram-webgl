@@ -3,7 +3,7 @@ import { Shader } from "./gl-utils/shader";
 import { VBO } from "./gl-utils/vbo";
 import { Heightmap } from "./heightmap";
 
-import { Parameters } from "./parameters";
+import { ETileMode, Parameters } from "./parameters";
 import { Tile } from "./tile";
 
 import { asyncLoadShader } from "./utils";
@@ -36,6 +36,7 @@ class Engine {
             if (this.stereogramShader) {
                 this.stereogramShader.u["uTileTexture"].value = tile.id;
                 this.stereogramShader.u["uDepthFactor"].value = Parameters.depth;
+                this.stereogramShader.u["uTileColor"].value = (Parameters.tileMode === ETileMode.NOISE && !Parameters.noiseTileColored) ? 0 : 1;
                 this.stereogramShader.u["uShowUV"].value = Parameters.showUV ? 1 : 0;
 
                 shader = this.stereogramShader;
