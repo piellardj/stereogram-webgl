@@ -13,12 +13,8 @@ class Heightmap {
         });
     }
 
-    public get id(): WebGLTexture {
-        return this.heightmapTexture.id;
-    }
-
-    public get loaded(): boolean {
-        return this.heightmapTexture.loaded;
+    public get current(): ImageTexture {
+        return this.heightmapTexture;
     }
 }
 

@@ -35,6 +35,7 @@ class Engine {
 
     public draw(heightmap: Heightmap, tile: Tile): boolean {
         const tileTexture = tile.current;
+        const heightmapTexture = heightmap.current;
 
         let shader: Shader;
         if (Parameters.showHeightmap) {
@@ -47,7 +48,6 @@ class Engine {
                 const tileHeight = tileHeightInPixel / gl.canvas.height;
 
                 this.stereogramShader.u["uTileTexture"].value = tileTexture.id;
-                this.stereogramShader.u["uDepthFactor"].value = Parameters.depth;
                 this.stereogramShader.u["uTileColor"].value = (Parameters.tileMode === ETileMode.NOISE && !Parameters.noiseTileColored) ? 0 : 1;
                 this.stereogramShader.u["uTileHeight"].value = tileHeight;
                 this.stereogramShader.u["uShowUV"].value = Parameters.showUV ? 1 : 0;
@@ -59,13 +59,23 @@ class Engine {
         if (shader) {
             gl.bindFramebuffer(gl.FRAMEBUFFER, null);
             gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-            shader.u["uHeightmapTexture"].value = heightmap.id;
+            shader.u["uHeightmapTexture"].value = heightmapTexture.id;
             shader.u["uInvertHeightmap"].value = Parameters.invertHeightmap;
+            shader.u["uDepthFactor"].value = Parameters.depth;
+
+            const canvasAspectRatio = gl.canvas.width / gl.canvas.height;
+            const heightmapAspectRatio = heightmapTexture.width / heightmapTexture.height;
+            if (canvasAspectRatio > heightmapAspectRatio) {
+                shader.u["uHeightmapScaling"].value = [canvasAspectRatio / heightmapAspectRatio, 1];
+            } else {
+                shader.u["uHeightmapScaling"].value = [1, heightmapAspectRatio / canvasAspectRatio];
+            }
+
             shader.use();
             shader.bindUniformsAndAttributes();
             gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
-            return heightmap.loaded && tileTexture.loaded;
+            return heightmapTexture.loaded && tileTexture.loaded;
         }
 
         return false;
