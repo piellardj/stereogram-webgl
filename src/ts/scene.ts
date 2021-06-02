@@ -88,6 +88,10 @@ class Scene {
 
     public computeDepthMap(width: number, height: number): void {
         if (this.shader) {
+            const smallestDimension = Math.min(width, height);
+            width = smallestDimension;
+            height = smallestDimension;
+
             mat4.fromRotation(this.modelMatrix, 0.0005 * performance.now(), [0, 0, 1]);
             mat4.multiply(this.mvMatrix, this.viewMatrix, this.modelMatrix);
 
