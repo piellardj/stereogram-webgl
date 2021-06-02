@@ -4,8 +4,8 @@ uniform sampler2D uTileTexture;
 uniform sampler2D uHeightmapTexture;
 
 uniform float uTileColor;
+uniform float uTileHeight;
 uniform float uShowUV;
-
 uniform float uDepthFactor;
 
 varying vec2 vPosition;
@@ -25,7 +25,7 @@ vec2 originalPosition(vec2 position) {
             position.x -= 1.0 - heightmap(previousPosition) * 0.45;
         }
     }
-    position.y = fract(stripesCount * position.y);
+    position.y = fract(uTileHeight * position.y);
     return position;
 }
 

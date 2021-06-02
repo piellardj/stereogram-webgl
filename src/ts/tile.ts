@@ -26,6 +26,10 @@ class Tile {
         return this.tileTexture.loaded;
     }
 
+    public get aspectRatio(): number {
+        return this.tileTexture.width / this.tileTexture.height;
+    }
+
     public randomize(width: number, height: number): boolean {
         const data = new Uint8ClampedArray(width * height * 4);
 

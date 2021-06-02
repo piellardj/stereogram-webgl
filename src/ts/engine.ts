@@ -39,9 +39,14 @@ class Engine {
             shader = this.heightmapShader;
         } else {
             if (this.stereogramShader) {
+                const tileWidthInPixel = gl.canvas.width / (this.stripesCount + 1);
+                const tileHeightInPixel = tileWidthInPixel / tile.aspectRatio;
+                const tileHeight = gl.canvas.height / tileHeightInPixel;
+
                 this.stereogramShader.u["uTileTexture"].value = tile.id;
                 this.stereogramShader.u["uDepthFactor"].value = Parameters.depth;
                 this.stereogramShader.u["uTileColor"].value = (Parameters.tileMode === ETileMode.NOISE && !Parameters.noiseTileColored) ? 0 : 1;
+                this.stereogramShader.u["uTileHeight"].value = tileHeight;
                 this.stereogramShader.u["uShowUV"].value = Parameters.showUV ? 1 : 0;
 
                 shader = this.stereogramShader;
