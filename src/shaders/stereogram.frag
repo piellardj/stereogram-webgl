@@ -17,13 +17,14 @@ float heightmap(const vec2 position) {
 }
 
 vec2 originalPosition(vec2 position) {
-    position *= float(uStripesCount);
+    position.x *= float(uStripesCount + 1);
     for(int i = 0; i < uStripesCount + 8; i++) {
         if(position.x >= 1.0) {
-            position.x -= 1.0 - heightmap(position / float(uStripesCount)) * 0.45;
+            vec2 previousPosition = vec2((position.x - 1.0) / float(uStripesCount), position.y);
+            position.x -= 1.0 - heightmap(previousPosition) * 0.45;
         }
     }
-    position.y = fract(position.y);
+    position.y = fract(float(uStripesCount) * position.y);
     return position;
 }
 
