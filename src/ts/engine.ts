@@ -36,6 +36,8 @@ class Engine {
             if (this.stereogramShader) {
                 this.stereogramShader.u["uTileTexture"].value = tile.id;
                 this.stereogramShader.u["uDepthFactor"].value = Parameters.depth;
+                this.stereogramShader.u["uShowUV"].value = Parameters.showUV ? 1 : 0;
+
                 shader = this.stereogramShader;
             }
         }

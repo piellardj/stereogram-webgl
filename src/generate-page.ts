@@ -57,6 +57,12 @@ const data = {
                     id: "tile-noise-colored-checkbox-id",
                     checked: true,
                 },
+                {
+                    type: Demopage.supportedControls.Checkbox,
+                    title: "Show UV",
+                    id: "show-uv-checkbox-id",
+                    checked: false,
+                },
             ]
         },
         {

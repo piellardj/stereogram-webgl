@@ -6,6 +6,7 @@ const controlId = {
     TILE_MODE_TABS: "tile-mode-tabs-id",
     TILE_NOISE_RESOLUTION: "tile-noise-resolution-range-id",
     TILE_NOISE_COLORED: "tile-noise-colored-checkbox-id",
+    SHOW_UV: "show-uv-checkbox-id",
 
     DEPTH_RANGE: "depth-range-id",
     SHOW_HEIGHTMAP: "show-heightmap-checkbox-id",
@@ -49,6 +50,9 @@ abstract class Parameters {
     public static get noiseTileColored(): boolean {
         return Page.Checkbox.isChecked(controlId.TILE_NOISE_COLORED);
     }
+    public static get showUV(): boolean {
+        return Page.Checkbox.isChecked(controlId.SHOW_UV);
+    }
 
     public static get depth(): number {
         return Page.Range.getValue(controlId.DEPTH_RANGE);
@@ -74,6 +78,7 @@ updateTileNoiseControlsVisibility();
 
 Page.Range.addObserver(controlId.DEPTH_RANGE, callRedrawObservers);
 Page.Checkbox.addObserver(controlId.SHOW_HEIGHTMAP, callRedrawObservers);
+Page.Checkbox.addObserver(controlId.SHOW_UV, callRedrawObservers);
 
 Page.Range.addObserver(controlId.TILE_NOISE_RESOLUTION, callRecomputeNoiseTileObservers);
 Page.Checkbox.addObserver(controlId.TILE_NOISE_COLORED, callRecomputeNoiseTileObservers);

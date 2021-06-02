@@ -3,6 +3,8 @@ precision mediump float;
 uniform sampler2D uTileTexture;
 uniform sampler2D uHeightmapTexture;
 
+uniform float uShowUV;
+
 uniform float uDepthFactor;
 
 const int uStripesCount = 16;
@@ -27,6 +29,7 @@ vec2 originalPosition(vec2 position) {
 void main(void) {
     vec2 position = originalPosition(vPosition);
 
-    vec3 color = texture2D(uTileTexture, position).rgb;
-    gl_FragColor = vec4(color, 1);
+    vec4 colorUV = vec4(position, 0, 1);
+    vec4 color = texture2D(uTileTexture, position);
+    gl_FragColor = mix(color, colorUV, uShowUV);
 }
