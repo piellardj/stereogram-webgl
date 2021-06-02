@@ -72,7 +72,7 @@ const data = {
             ]
         },
         {
-            title: "Display",
+            title: "Heightmap",
             controls: [
                 {
                     type: Demopage.supportedControls.Range,
@@ -82,6 +82,12 @@ const data = {
                     max: 1,
                     value: 0.75,
                     step: 0.01
+                },
+                {
+                    type: Demopage.supportedControls.Checkbox,
+                    title: "Invert",
+                    id: "invert-heightmap-checkbox-id",
+                    checked: false,
                 },
                 {
                     type: Demopage.supportedControls.Checkbox,

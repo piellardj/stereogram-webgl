@@ -10,6 +10,7 @@ const controlId = {
     TILE_UPLOAD_BUTTON: "input-tile-upload-button",
 
     DEPTH_RANGE: "depth-range-id",
+    HEIGHTMAP_INVERT_CHECKBOX: "invert-heightmap-checkbox-id",
     SHOW_HEIGHTMAP: "show-heightmap-checkbox-id",
 
     IMAGE_DOWNLOAD: "image-download-id",
@@ -60,7 +61,9 @@ abstract class Parameters {
     public static get depth(): number {
         return Page.Range.getValue(controlId.DEPTH_RANGE);
     }
-
+    public static get invertHeightmap(): boolean {
+        return Page.Checkbox.isChecked(controlId.HEIGHTMAP_INVERT_CHECKBOX);
+    }
     public static get showHeightmap(): boolean {
         return Page.Checkbox.isChecked(controlId.SHOW_HEIGHTMAP);
     }
@@ -98,6 +101,7 @@ Page.FileControl.addUploadObserver(controlId.TILE_UPLOAD_BUTTON, (filesList: Fil
 });
 
 Page.Range.addObserver(controlId.DEPTH_RANGE, callRedrawObservers);
+Page.Checkbox.addObserver(controlId.HEIGHTMAP_INVERT_CHECKBOX, callRedrawObservers);
 Page.Checkbox.addObserver(controlId.SHOW_HEIGHTMAP, callRedrawObservers);
 Page.Checkbox.addObserver(controlId.SHOW_UV, callRedrawObservers);
 

@@ -57,6 +57,7 @@ class Engine {
             gl.bindFramebuffer(gl.FRAMEBUFFER, null);
             gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
             shader.u["uHeightmapTexture"].value = heightmap.id;
+            shader.u["uInvertHeightmap"].value = Parameters.invertHeightmap;
             shader.use();
             shader.bindUniformsAndAttributes();
             gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);

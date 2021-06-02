@@ -5,13 +5,17 @@ uniform sampler2D uHeightmapTexture;
 
 uniform float uTileColor;
 uniform float uTileHeight;
-uniform float uShowUV;
+
 uniform float uDepthFactor;
+uniform float uInvertHeightmap;
+uniform float uShowUV;
 
 varying vec2 vPosition;
 
 float heightmap(const vec2 position) {
-    return uDepthFactor * (1.0 - texture2D(uHeightmapTexture, position * vec2(1, -1) + vec2(0, 1)).r);
+    float value = texture2D(uHeightmapTexture, vec2(position.x, 1.0 - position.y)).r;
+    value = mix(value, 1.0 - value, uInvertHeightmap);
+    return uDepthFactor * value;
 }
 
 vec2 originalPosition(vec2 position) {
