@@ -36,9 +36,11 @@ vec2 originalPosition(vec2 position) {
 void main(void) {
     vec2 position = originalPosition(vPosition);
 
-    vec4 colorUV = vec4(position, 0, 1);
-
     vec4 tileSample = texture2D(uTileTexture, position);
-    vec4 color = mix(vec4(vec3(tileSample.r), 1), tileSample, uTileColor);
+    vec4 monocolorTile = vec4(vec3(tileSample.r), 1);
+    
+    vec4 color = mix(monocolorTile, tileSample, uTileColor);
+
+    vec4 colorUV = vec4(position, 0, 1);
     gl_FragColor = mix(color, colorUV, uShowUV);
 }
