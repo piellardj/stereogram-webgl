@@ -8,8 +8,6 @@ uniform float uShowUV;
 
 uniform float uDepthFactor;
 
-const int uStripesCount = 16;
-
 varying vec2 vPosition;
 
 float heightmap(const vec2 position) {
@@ -17,14 +15,17 @@ float heightmap(const vec2 position) {
 }
 
 vec2 originalPosition(vec2 position) {
-    position.x *= float(uStripesCount + 1);
-    for(int i = 0; i < uStripesCount + 8; i++) {
+    const float stripesCount = #INJECT(STRIPES_COUNT);
+    const int loopSize = #INJECT(LOOP_SIZE);
+
+    position.x *= stripesCount + 1.0;
+    for(int i = 0; i < loopSize; i++) {
         if(position.x >= 1.0) {
-            vec2 previousPosition = vec2((position.x - 1.0) / float(uStripesCount), position.y);
+            vec2 previousPosition = vec2((position.x - 1.0) / stripesCount, position.y);
             position.x -= 1.0 - heightmap(previousPosition) * 0.45;
         }
     }
-    position.y = fract(float(uStripesCount) * position.y);
+    position.y = fract(stripesCount * position.y);
     return position;
 }
 

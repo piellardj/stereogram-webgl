@@ -14,12 +14,17 @@ class Engine {
     private stereogramShader: Shader;
     private heightmapShader: Shader;
 
+    private stripesCount: number = 16;
+
     public constructor() {
         this.fullscreenVBO = VBO.createQuad(gl, -1, -1, 1, 1);
 
         asyncLoadShader("stereomap", "fullscreen.vert", "stereogram.frag", (shader: Shader) => {
             shader.a["aCorner"].VBO = this.fullscreenVBO;
             this.stereogramShader = shader;
+        }, {
+            STRIPES_COUNT: this.stripesCount.toFixed(1),
+            LOOP_SIZE: Math.ceil(1.5 * this.stripesCount).toFixed(0),
         });
 
         asyncLoadShader("heightmap", "fullscreen.vert", "heightmap.frag", (shader: Shader) => {
