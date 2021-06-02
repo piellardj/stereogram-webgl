@@ -11,6 +11,10 @@ class Tile {
         this.tileTexture = new ImageTexture();
         this.tileTexture.loadFromUrl("resources/tile.png");
 
+        Parameters.tileUploadObservers.push((image: HTMLImageElement) => {
+            this.tileTexture.uploadToGPU(image);
+        });
+
         this.randomTexture = new ImageTexture();
     }
 

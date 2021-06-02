@@ -7,6 +7,7 @@ const controlId = {
     TILE_NOISE_RESOLUTION: "tile-noise-resolution-range-id",
     TILE_NOISE_COLORED: "tile-noise-colored-checkbox-id",
     SHOW_UV: "show-uv-checkbox-id",
+    TILE_UPLOAD_BUTTON: "input-tile-upload-button",
 
     DEPTH_RANGE: "depth-range-id",
     SHOW_HEIGHTMAP: "show-heightmap-checkbox-id",
@@ -15,6 +16,7 @@ const controlId = {
 };
 
 type Observer = () => unknown;
+type ImageUploadObserver = (image: HTMLImageElement) => unknown;
 
 function callObservers(observers: Observer[]): void {
     for (const observer of observers) {
@@ -37,6 +39,7 @@ enum ETileMode {
 }
 
 abstract class Parameters {
+    public static readonly tileUploadObservers: ImageUploadObserver[] = [];
     public static readonly redrawObservers: Observer[] = [];
     public static readonly recomputeNoiseTileObservers: Observer[] = [];
     public static readonly imageDownloadObservers: Observer[] = [];
@@ -67,6 +70,7 @@ function updateTileNoiseControlsVisibility(): void {
     const isTileNoiseMode = (Parameters.tileMode === ETileMode.NOISE);
     Page.Controls.setVisibility(controlId.TILE_NOISE_RESOLUTION, isTileNoiseMode);
     Page.Controls.setVisibility(controlId.TILE_NOISE_COLORED, isTileNoiseMode);
+    Page.Controls.setVisibility(controlId.TILE_UPLOAD_BUTTON, !isTileNoiseMode);
 }
 
 Page.Canvas.Observers.canvasResize.push(callRedrawObservers);
@@ -75,6 +79,23 @@ Page.Tabs.addObserver(controlId.TILE_MODE_TABS, () => {
     callRedrawObservers();
 });
 updateTileNoiseControlsVisibility();
+
+Page.FileControl.addUploadObserver(controlId.TILE_UPLOAD_BUTTON, (filesList: FileList) => {
+    if (filesList.length === 1) {
+        const reader = new FileReader();
+        reader.onload = () => {
+            const image = new Image();
+            image.addEventListener("load", () => {
+                for (const observer of Parameters.tileUploadObservers) {
+                    observer(image);
+                }
+                callRedrawObservers();
+            });
+            image.src = reader.result as string;
+        };
+        reader.readAsDataURL(filesList[0]);
+    }
+});
 
 Page.Range.addObserver(controlId.DEPTH_RANGE, callRedrawObservers);
 Page.Checkbox.addObserver(controlId.SHOW_HEIGHTMAP, callRedrawObservers);

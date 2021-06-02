@@ -63,6 +63,12 @@ const data = {
                     id: "show-uv-checkbox-id",
                     checked: false,
                 },
+                {
+                    type: Demopage.supportedControls.FileUpload,
+                    id: "input-tile-upload-button",
+                    accept: [".png", ".jpg", ".bmp", ".webp"],
+                    defaultMessage: "Upload"
+                },
             ]
         },
         {
