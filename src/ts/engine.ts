@@ -28,7 +28,7 @@ class Engine {
         });
     }
 
-    public draw(heightmap: Heightmap, tile: Tile): void {
+    public draw(heightmap: Heightmap, tile: Tile): boolean {
         let shader: Shader;
         if (Parameters.showHeightmap) {
             shader = this.heightmapShader;
@@ -50,7 +50,11 @@ class Engine {
             shader.use();
             shader.bindUniformsAndAttributes();
             gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+
+            return heightmap.loaded && tile.loaded;
         }
+
+        return false;
     }
 }
 

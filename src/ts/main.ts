@@ -56,8 +56,7 @@ function main(): void {
 
         if (needToRedraw) {
             GLCanvas.adjustSize(false);
-            engine.draw(heightmap, tile);
-            needToRedraw = false;
+            needToRedraw = !engine.draw(heightmap, tile);
         }
 
         requestAnimationFrame(mainLoop);

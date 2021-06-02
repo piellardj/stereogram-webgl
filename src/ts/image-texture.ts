@@ -7,13 +7,15 @@ const defaultImageData = createImageData(1, 1, new Uint8ClampedArray([0, 0, 0, 0
 
 class ImageTexture {
     public readonly id: WebGLTexture;
+    private _loaded: boolean;
     private _width: number = -1;
     private _height: number = -1;
 
-    public constructor(image?: ImageData) {
+    public constructor() {
         this.id = gl.createTexture();
 
-        this.uploadToGPU(image ?? defaultImageData);
+        this.uploadToGPU(defaultImageData);
+        this._loaded = false;
     }
 
     public loadFromUrl(url: string): void {
@@ -41,6 +43,8 @@ class ImageTexture {
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
         gl.bindTexture(gl.TEXTURE_2D, null);
+
+        this._loaded = true;
     }
 
     public get width(): number {
@@ -48,6 +52,10 @@ class ImageTexture {
     }
     public get height(): number {
         return this._height;
+    }
+
+    public get loaded(): boolean {
+        return this._loaded;
     }
 }
 

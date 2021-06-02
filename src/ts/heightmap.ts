@@ -11,6 +11,10 @@ class Heightmap {
     public get id(): WebGLTexture {
         return this.heightmapTexture.id;
     }
+
+    public get loaded(): boolean {
+        return this.heightmapTexture.loaded;
+    }
 }
 
 export {

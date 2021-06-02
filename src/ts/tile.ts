@@ -22,6 +22,10 @@ class Tile {
         }
     }
 
+    public get loaded(): boolean {
+        return this.tileTexture.loaded;
+    }
+
     public randomize(width: number, height: number): boolean {
         const data = new Uint8ClampedArray(width * height * 4);
 
