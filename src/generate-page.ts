@@ -27,6 +27,12 @@ const data = {
             title: "Tile",
             controls: [
                 {
+                    type: Demopage.supportedControls.Checkbox,
+                    title: "Show UV",
+                    id: "show-uv-checkbox-id",
+                    checked: false,
+                },
+                {
                     type: Demopage.supportedControls.Tabs,
                     title: "Mode",
                     id: "tile-mode-tabs-id",
@@ -59,13 +65,8 @@ const data = {
                     checked: true,
                 },
                 {
-                    type: Demopage.supportedControls.Checkbox,
-                    title: "Show UV",
-                    id: "show-uv-checkbox-id",
-                    checked: false,
-                },
-                {
                     type: Demopage.supportedControls.FileUpload,
+                    title: "Custom",
                     id: "input-tile-upload-button",
                     accept: [".png", ".jpg", ".bmp", ".webp"],
                     defaultMessage: "Upload a pattern"
@@ -73,8 +74,29 @@ const data = {
             ]
         },
         {
-            title: "Heightmap",
+            title: "Depth map",
             controls: [
+                {
+                    type: Demopage.supportedControls.Checkbox,
+                    title: "Show greyscale",
+                    id: "show-heightmap-checkbox-id",
+                    checked: false,
+                },
+                {
+                    type: Demopage.supportedControls.Range,
+                    title: "Depth",
+                    id: "depth-range-id",
+                    min: 0,
+                    max: 1,
+                    value: 0.75,
+                    step: 0.01
+                },
+                {
+                    type: Demopage.supportedControls.Checkbox,
+                    title: "Invert",
+                    id: "invert-heightmap-checkbox-id",
+                    checked: false,
+                },
                 {
                     type: Demopage.supportedControls.Tabs,
                     title: "Mode",
@@ -118,31 +140,11 @@ const data = {
                     ]
                 },
                 {
-                    type: Demopage.supportedControls.Range,
-                    title: "Depth",
-                    id: "depth-range-id",
-                    min: 0,
-                    max: 1,
-                    value: 0.75,
-                    step: 0.01
-                },
-                {
-                    type: Demopage.supportedControls.Checkbox,
-                    title: "Invert",
-                    id: "invert-heightmap-checkbox-id",
-                    checked: false,
-                },
-                {
-                    type: Demopage.supportedControls.Checkbox,
-                    title: "Show heightmap",
-                    id: "show-heightmap-checkbox-id",
-                    checked: false,
-                },
-                {
                     type: Demopage.supportedControls.FileUpload,
+                    title: "Custom",
                     id: "input-heightmap-upload-button",
                     accept: [".png", ".jpg", ".bmp", ".webp"],
-                    defaultMessage: "Upload a heightmap"
+                    defaultMessage: "Upload a depth map"
                 },
             ]
         },
