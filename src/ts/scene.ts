@@ -70,10 +70,6 @@ class Scene {
 
     public computeDepthMap(width: number, height: number): void {
         if (this.shader) {
-            const smallestDimension = Math.min(width, height);
-            width = smallestDimension;
-            height = smallestDimension;
-
             const modelPreset = presets[Parameters.modelId];
 
             mat4.lookAt(this.viewMatrix, modelPreset.cameraPosition, [0, 0, 0], [0, 0, 1]);
