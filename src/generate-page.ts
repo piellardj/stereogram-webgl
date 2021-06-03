@@ -99,6 +99,10 @@ const data = {
                     placeholder: "Custom",
                     options: [
                         {
+                            value: "primitives",
+                            label: "Primitives",
+                        },
+                        {
                             value: "cube",
                             label: "Cube",
                             checked: true,

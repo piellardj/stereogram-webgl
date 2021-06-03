@@ -14,6 +14,12 @@ interface IScenePreset {
 }
 
 const presets: { [id: string]: IScenePreset } = {
+    "primitives": {
+        modelName: "primitives.obj",
+        cameraPosition: [-1.3, 0, -0.5],
+        nearPlane: 0.6,
+        farPlane: 2.2,
+    },
     "cube": {
         modelName: "cube.obj",
         cameraPosition: [-2, 0, -1],
