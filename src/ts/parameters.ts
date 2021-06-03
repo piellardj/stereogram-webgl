@@ -4,6 +4,7 @@ import "./page-interface-generated";
 /* === IDs ============================================================ */
 const controlId = {
     TILE_MODE_TABS: "tile-mode-tabs-id",
+    TILE_PRESET_SELECT: "tile-preset-select-id",
     TILE_NOISE_RESOLUTION: "tile-noise-resolution-range-id",
     TILE_NOISE_SQUARE: "tile-noise-square-checkbox-id",
     TILE_NOISE_COLORED: "tile-noise-colored-checkbox-id",
@@ -60,6 +61,9 @@ abstract class Parameters {
     public static get tileMode(): ETileMode {
         return Page.Tabs.getValues(controlId.TILE_MODE_TABS)[0] as ETileMode;
     }
+    public static get tilePreset(): string {
+        return Page.Select.getValue(controlId.TILE_PRESET_SELECT);
+    }
     public static get noiseTileResolution(): number {
         return Page.Range.getValue(controlId.TILE_NOISE_RESOLUTION);
     }
@@ -95,6 +99,7 @@ function updateTileNoiseControlsVisibility(): void {
     Page.Controls.setVisibility(controlId.TILE_NOISE_RESOLUTION, isTileNoiseMode);
     Page.Controls.setVisibility(controlId.TILE_NOISE_COLORED, isTileNoiseMode);
     Page.Controls.setVisibility(controlId.TILE_NOISE_SQUARE, isTileNoiseMode);
+    Page.Controls.setVisibility(controlId.TILE_PRESET_SELECT, !isTileNoiseMode);
     Page.Controls.setVisibility(controlId.TILE_UPLOAD_BUTTON, !isTileNoiseMode);
 
     const isMovingMode = (Parameters.heightmapMode === EHeightmapMode.MOVING);
@@ -145,6 +150,8 @@ Page.Checkbox.addObserver(controlId.SHOW_UV, callRedrawObservers);
 Page.Range.addObserver(controlId.TILE_NOISE_RESOLUTION, callRecomputeNoiseTileObservers);
 Page.Checkbox.addObserver(controlId.TILE_NOISE_SQUARE, callRecomputeNoiseTileObservers);
 Page.Checkbox.addObserver(controlId.TILE_NOISE_COLORED, callRecomputeNoiseTileObservers);
+
+Page.Select.addObserver(controlId.TILE_PRESET_SELECT, callRedrawObservers);
 
 Page.FileControl.addDownloadObserver(controlId.IMAGE_DOWNLOAD, () => {
     callObservers(Parameters.imageDownloadObservers);

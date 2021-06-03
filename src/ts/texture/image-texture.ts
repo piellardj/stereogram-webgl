@@ -22,6 +22,8 @@ class ImageTexture implements IAsyncTexture {
     public loadFromUrl(url: string): void {
         url = `${url}?v=${Page.version}`;
 
+        this._loaded = false;
+
         Loader.registerLoadingObject(url);
 
         const rampImage = new Image();

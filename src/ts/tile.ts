@@ -9,12 +9,12 @@ interface ITileTexture {
 
 class Tile {
     private readonly tileTexture: ImageTexture;
+    private currentTilePreset: string;
 
     private readonly randomTexture: ImageTexture;
 
     public constructor() {
         this.tileTexture = new ImageTexture();
-        this.tileTexture.loadFromUrl("resources/tile.png");
 
         Parameters.tileUploadObservers.push((image: HTMLImageElement) => {
             this.tileTexture.uploadToGPU(image);
@@ -25,6 +25,11 @@ class Tile {
 
     public get current(): ITileTexture {
         if (Parameters.tileMode === ETileMode.TEXTURE) {
+            if (this.currentTilePreset !== Parameters.tilePreset) {
+                this.currentTilePreset = Parameters.tilePreset;
+                this.tileTexture.loadFromUrl(`resources/tiles/${Parameters.tilePreset}`);
+            }
+
             return {
                 texture: this.tileTexture,
                 padding: 0,

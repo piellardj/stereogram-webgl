@@ -50,6 +50,35 @@ const data = {
                     ]
                 },
                 {
+                    type: Demopage.supportedControls.Select,
+                    title: "Preset",
+                    id: "tile-preset-select-id",
+                    placeholder: "Custom",
+                    options: [
+                        {
+                            value: "wallpaper.png",
+                            label: "Wallpaper",
+                            checked: true,
+                        },
+                        {
+                            value: "foliage.png",
+                            label: "Foliage",
+                        },
+                        {
+                            value: "giraffe.png",
+                            label: "Giraffe",
+                        },
+                        {
+                            value: "stones.png",
+                            label: "Stones",
+                        },
+                        {
+                            value: "leaves.png",
+                            label: "Leaves",
+                        }
+                    ]
+                },
+                {
                     type: Demopage.supportedControls.Range,
                     title: "Resolution",
                     id: "tile-noise-resolution-range-id",
