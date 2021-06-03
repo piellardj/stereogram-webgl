@@ -1,5 +1,5 @@
 {
-  "name": "stereogram",
+  "name": "stereogram-webgl",
   "homepage": "https://piellardj.github.io/stereogram",
   "scripts": {
     "pre-commit": "npm run rebuild && npm run lint",
@@ -13,7 +13,6 @@
     "webpack": "webpack --config src/config/webpack.config.js"
   },
   "author": "Jérémie PIELLARD <jeremie.piellard@gmail.com> (https://github.com/piellardj)",
-  "repository": "github:piellardj/stereogram",
   "devDependencies": {
     "@types/fs-extra": "^9.0.11",
     "@types/node": "^15.6.1",
@@ -28,4 +27,5 @@
     "webpack-cli": "^4.7.0",
     "webpage-templates": "github:piellardj/webpage-templates"
   }
+  "repository": "github:piellardj/stereogram-webgl",
 }

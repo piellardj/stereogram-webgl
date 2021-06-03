@@ -9,7 +9,7 @@ const data = {
     introduction: [
         "INTRODUCTION",
     ],
-    githubProjectName: "stereogram",
+    githubProjectName: "stereogram-webgl",
     additionalLinks: [],
     styleFiles: [],
     scriptFiles: [
