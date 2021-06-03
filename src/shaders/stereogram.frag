@@ -4,6 +4,7 @@ uniform sampler2D uTileTexture;
 
 uniform float uTileColor;
 uniform float uTileHeight;
+uniform vec2 uTileScaling;
 uniform float uShowUV;
 
 varying vec2 vPosition;
@@ -25,12 +26,17 @@ vec2 originalPosition(vec2 position) {
     return position;
 }
 
+vec4 sampleTile(vec2 coords) {
+    coords = 0.5 + (coords - 0.5) * uTileScaling;
+    return texture2D(uTileTexture, coords);
+}
+
 void main(void) {
     vec2 position = originalPosition(vPosition);
 
-    vec4 tileSample = texture2D(uTileTexture, position);
+    vec4 tileSample = sampleTile(position);
     vec4 monocolorTile = vec4(vec3(tileSample.r), 1);
-    
+
     vec4 color = mix(monocolorTile, tileSample, uTileColor);
 
     vec4 colorUV = vec4(position, 0, 1);

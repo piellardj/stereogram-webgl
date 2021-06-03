@@ -34,7 +34,7 @@ class Engine {
     }
 
     public draw(heightmap: Heightmap, tile: Tile): boolean {
-        const tileTexture = tile.current;
+        const currentTile = tile.current;
         const heightmapTexture = heightmap.current;
 
         let shader: Shader;
@@ -42,14 +42,17 @@ class Engine {
             shader = this.heightmapShader;
         } else {
             if (this.stereogramShader) {
+                const tileUsefulWidth = currentTile.texture.width - 2 * currentTile.padding;
+                const tileUsefulHeight = currentTile.texture.height - 2 * currentTile.padding;
 
                 const tileWidthInPixel = gl.canvas.width / (this.stripesCount + 1);
-                const tileHeightInPixel = tileWidthInPixel / (tileTexture.width / tileTexture.height);
+                const tileHeightInPixel = tileWidthInPixel / (tileUsefulWidth / tileUsefulHeight);
                 const tileHeight = tileHeightInPixel / gl.canvas.height;
 
-                this.stereogramShader.u["uTileTexture"].value = tileTexture.id;
+                this.stereogramShader.u["uTileTexture"].value = currentTile.texture.id;
                 this.stereogramShader.u["uTileColor"].value = (Parameters.tileMode === ETileMode.NOISE && !Parameters.noiseTileColored) ? 0 : 1;
                 this.stereogramShader.u["uTileHeight"].value = tileHeight;
+                this.stereogramShader.u["uTileScaling"].value = [tileUsefulWidth / currentTile.texture.width, tileUsefulHeight / currentTile.texture.height];
                 this.stereogramShader.u["uShowUV"].value = Parameters.showUV ? 1 : 0;
 
                 shader = this.stereogramShader;
@@ -77,7 +80,7 @@ class Engine {
             shader.bindUniformsAndAttributes();
             gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
-            return heightmapTexture.loaded && tileTexture.loaded;
+            return heightmapTexture.loaded && currentTile.texture.loaded;
         }
 
         return false;
