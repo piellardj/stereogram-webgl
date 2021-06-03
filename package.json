@@ -13,9 +13,10 @@
     "webpack": "webpack --config src/config/webpack.config.js"
   },
   "author": "Jérémie PIELLARD <jeremie.piellard@gmail.com> (https://github.com/piellardj)",
+  "repository": "github:piellardj/stereogram-webgl",
   "devDependencies": {
     "@types/fs-extra": "^9.0.11",
-    "@types/node": "^15.6.1",
+    "@types/node": "^15.9.0",
     "fs-extra": "^10.0.0",
     "http-server": "^0.12.3",
     "shx": "^0.3.3",
@@ -27,5 +28,4 @@
     "webpack-cli": "^4.7.0",
     "webpage-templates": "github:piellardj/webpage-templates"
   }
-  "repository": "github:piellardj/stereogram-webgl",
 }
