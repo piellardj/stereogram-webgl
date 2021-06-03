@@ -25,6 +25,12 @@ const presets: { [id: string]: IScenePreset } = {
         cameraPosition: [-1.3, 0, -0.5],
         nearPlane: 0.7,
         farPlane: 2,
+    },
+    "bunny": {
+        modelName: "bunny.obj",
+        cameraPosition: [-1.7, 0, -0.8],
+        nearPlane: 0.9,
+        farPlane: 2.3,
     }
 };
 

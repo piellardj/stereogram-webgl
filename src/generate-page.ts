@@ -106,6 +106,10 @@ const data = {
                         {
                             value: "monkey",
                             label: "Monkey",
+                        },
+                        {
+                            value: "bunny",
+                            label: "Bunny",
                         }
                     ]
                 },
