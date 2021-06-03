@@ -152,6 +152,47 @@ const data = {
                 {
                     type: Demopage.supportedControls.Select,
                     title: "Preset",
+                    id: "heightmap-preset-select-id",
+                    placeholder: "Custom",
+                    options: [
+                        {
+                            value: "grid.png",
+                            label: "Grid",
+                            checked: true,
+                        },
+                        {
+                            value: "planet.png",
+                            label: "Planet",
+                        },
+                        {
+                            value: "hand.png",
+                            label: "Hand",
+                        },
+                        {
+                            value: "hello.png",
+                            label: "Hello",
+                        },
+                        {
+                            value: "ripple.png",
+                            label: "Ripple",
+                        },
+                        {
+                            value: "head.png",
+                            label: "Head",
+                        },
+                        {
+                            value: "dog.png",
+                            label: "Dog",
+                        },
+                        {
+                            value: "car.png",
+                            label: "Car",
+                        }
+                    ]
+                },
+                {
+                    type: Demopage.supportedControls.Select,
+                    title: "Preset",
                     id: "model-preset-select-id",
                     placeholder: "Custom",
                     options: [

@@ -6,11 +6,12 @@ import { IAsyncTexture } from "./texture/i-texture";
 
 class Heightmap {
     private readonly heightmapTexture: ImageTexture;
+    private currentHeightmapPreset: string;
+
     private readonly scene: Scene;
 
     public constructor() {
         this.heightmapTexture = new ImageTexture();
-        this.heightmapTexture.loadFromUrl("resources/heightmap.png");
 
         this.scene = new Scene();
 
@@ -25,6 +26,11 @@ class Heightmap {
             this.scene.depthMap.loaded = true;
             return this.scene.depthMap;
         } else {
+            if (this.currentHeightmapPreset !== Parameters.heightmapPreset) {
+                this.currentHeightmapPreset = Parameters.heightmapPreset;
+                this.heightmapTexture.loadFromUrl(`resources/heightmaps/${Parameters.heightmapPreset}`);
+            }
+
             return this.heightmapTexture;
         }
     }

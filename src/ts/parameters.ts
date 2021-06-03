@@ -12,6 +12,7 @@ const controlId = {
     TILE_UPLOAD_BUTTON: "input-tile-upload-button",
 
     HEIGHTMAP_MODE_TABS: "heightmap-mode-tabs-id",
+    HEIGHTMAP_PRESET_SELECT: "heightmap-preset-select-id",
     MODEL_PRESET_SELECT: "model-preset-select-id",
     DEPTH_RANGE: "depth-range-id",
     HEIGHTMAP_INVERT_CHECKBOX: "invert-heightmap-checkbox-id",
@@ -80,6 +81,9 @@ abstract class Parameters {
     public static get heightmapMode(): EHeightmapMode {
         return Page.Tabs.getValues(controlId.HEIGHTMAP_MODE_TABS)[0] as EHeightmapMode;
     }
+    public static get heightmapPreset(): string {
+        return Page.Select.getValue(controlId.HEIGHTMAP_PRESET_SELECT);
+    }
     public static get modelId(): string {
         return Page.Select.getValue(controlId.MODEL_PRESET_SELECT);
     }
@@ -103,6 +107,7 @@ function updateTileNoiseControlsVisibility(): void {
     Page.Controls.setVisibility(controlId.TILE_UPLOAD_BUTTON, !isTileNoiseMode);
 
     const isMovingMode = (Parameters.heightmapMode === EHeightmapMode.MOVING);
+    Page.Controls.setVisibility(controlId.HEIGHTMAP_PRESET_SELECT, !isMovingMode);
     Page.Controls.setVisibility(controlId.HEIGHTMAP_UPLOAD_BUTTON, !isMovingMode);
     Page.Controls.setVisibility(controlId.MODEL_PRESET_SELECT, isMovingMode);
 }
@@ -142,6 +147,7 @@ Page.FileControl.addUploadObserver(controlId.TILE_UPLOAD_BUTTON, imageUploadObse
 Page.FileControl.addUploadObserver(controlId.HEIGHTMAP_UPLOAD_BUTTON, imageUploadObserver(Parameters.heightmapUploadObservers));
 
 Page.Tabs.addObserver(controlId.HEIGHTMAP_MODE_TABS, callRedrawObservers);
+Page.Select.addObserver(controlId.HEIGHTMAP_PRESET_SELECT, callRedrawObservers);
 Page.Range.addObserver(controlId.DEPTH_RANGE, callRedrawObservers);
 Page.Checkbox.addObserver(controlId.HEIGHTMAP_INVERT_CHECKBOX, callRedrawObservers);
 Page.Checkbox.addObserver(controlId.SHOW_HEIGHTMAP, callRedrawObservers);
