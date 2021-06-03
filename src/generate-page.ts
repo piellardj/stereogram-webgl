@@ -60,6 +60,12 @@ const data = {
                 },
                 {
                     type: Demopage.supportedControls.Checkbox,
+                    title: "Square",
+                    id: "tile-noise-square-checkbox-id",
+                    checked: true,
+                },
+                {
+                    type: Demopage.supportedControls.Checkbox,
                     title: "Colored",
                     id: "tile-noise-colored-checkbox-id",
                     checked: true,

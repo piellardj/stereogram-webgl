@@ -5,6 +5,7 @@ import "./page-interface-generated";
 const controlId = {
     TILE_MODE_TABS: "tile-mode-tabs-id",
     TILE_NOISE_RESOLUTION: "tile-noise-resolution-range-id",
+    TILE_NOISE_SQUARE: "tile-noise-square-checkbox-id",
     TILE_NOISE_COLORED: "tile-noise-colored-checkbox-id",
     SHOW_UV: "show-uv-checkbox-id",
     TILE_UPLOAD_BUTTON: "input-tile-upload-button",
@@ -62,6 +63,9 @@ abstract class Parameters {
     public static get noiseTileResolution(): number {
         return Page.Range.getValue(controlId.TILE_NOISE_RESOLUTION);
     }
+    public static get noiseTileSquare(): boolean {
+        return Page.Checkbox.isChecked(controlId.TILE_NOISE_SQUARE);
+    }
     public static get noiseTileColored(): boolean {
         return Page.Checkbox.isChecked(controlId.TILE_NOISE_COLORED);
     }
@@ -90,6 +94,7 @@ function updateTileNoiseControlsVisibility(): void {
     const isTileNoiseMode = (Parameters.tileMode === ETileMode.NOISE);
     Page.Controls.setVisibility(controlId.TILE_NOISE_RESOLUTION, isTileNoiseMode);
     Page.Controls.setVisibility(controlId.TILE_NOISE_COLORED, isTileNoiseMode);
+    Page.Controls.setVisibility(controlId.TILE_NOISE_SQUARE, isTileNoiseMode);
     Page.Controls.setVisibility(controlId.TILE_UPLOAD_BUTTON, !isTileNoiseMode);
 
     const isMovingMode = (Parameters.heightmapMode === EHeightmapMode.MOVING);
@@ -138,6 +143,7 @@ Page.Checkbox.addObserver(controlId.SHOW_HEIGHTMAP, callRedrawObservers);
 Page.Checkbox.addObserver(controlId.SHOW_UV, callRedrawObservers);
 
 Page.Range.addObserver(controlId.TILE_NOISE_RESOLUTION, callRecomputeNoiseTileObservers);
+Page.Checkbox.addObserver(controlId.TILE_NOISE_SQUARE, callRecomputeNoiseTileObservers);
 Page.Checkbox.addObserver(controlId.TILE_NOISE_COLORED, callRecomputeNoiseTileObservers);
 
 Page.FileControl.addDownloadObserver(controlId.IMAGE_DOWNLOAD, () => {

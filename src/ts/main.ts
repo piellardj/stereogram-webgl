@@ -55,8 +55,9 @@ function main(): void {
         }
 
         if (needToRecomputeNoiseTile && Parameters.tileMode === ETileMode.NOISE) {
-            const resolution = Parameters.noiseTileResolution;
-            needToRecomputeNoiseTile = !tile.randomize(resolution, resolution);
+            const width = Parameters.noiseTileResolution;
+            const height = Parameters.noiseTileSquare ? width : 5 * width;
+            needToRecomputeNoiseTile = !tile.randomize(width, height);
         }
 
         if (needToRedraw) {
