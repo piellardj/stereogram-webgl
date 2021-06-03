@@ -63,7 +63,7 @@ class Tile {
         }
 
         // compute actual texture
-        for (let iY = 1; iY < width - 1; iY++) {
+        for (let iY = 1; iY < height - 1; iY++) {
             for (let iX = 1; iX < width - 1; iX++) {
                 const texelStart = 4 * (iX + width * iY);
                 data[texelStart + 0] = Math.floor(255.9 * Math.random());
