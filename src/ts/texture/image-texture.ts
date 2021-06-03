@@ -26,13 +26,13 @@ class ImageTexture implements IAsyncTexture {
 
         Loader.registerLoadingObject(url);
 
-        const rampImage = new Image();
-        rampImage.addEventListener("load", () => {
+        const image = new Image();
+        image.addEventListener("load", () => {
             Loader.registerLoadedObject(url);
-            this.uploadToGPU(rampImage);
+            this.uploadToGPU(image);
         });
 
-        rampImage.src = url;
+        image.src = url;
     }
 
     public uploadToGPU(image: HTMLImageElement | ImageData): void {
