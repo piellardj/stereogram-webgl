@@ -37,6 +37,12 @@ const presets: { [id: string]: IScenePreset } = {
         cameraPosition: [-1.7, 0, -0.8],
         nearPlane: 0.9,
         farPlane: 2.3,
+    },
+    "atomium": {
+        modelName: "atomium.obj",
+        cameraPosition: [-2.5, 0, -0.6],
+        nearPlane: 1.5,
+        farPlane: 3.4,
     }
 };
 

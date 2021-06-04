@@ -225,6 +225,10 @@ const data = {
                         {
                             value: "bunny",
                             label: "Bunny",
+                        },
+                        {
+                            value: "atomium",
+                            label: "Atomium",
                         }
                     ]
                 },
