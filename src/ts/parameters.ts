@@ -19,6 +19,7 @@ const controlId = {
     SHOW_HEIGHTMAP: "show-heightmap-checkbox-id",
     HEIGHTMAP_UPLOAD_BUTTON: "input-heightmap-upload-button",
 
+    SHOW_INDICATORS_CHECKBOX: "show-indicators-checkbox-id",
     IMAGE_DOWNLOAD: "image-download-id",
 };
 
@@ -162,6 +163,12 @@ Page.Select.addObserver(controlId.TILE_PRESET_SELECT, callRedrawObservers);
 Page.FileControl.addDownloadObserver(controlId.IMAGE_DOWNLOAD, () => {
     callObservers(Parameters.imageDownloadObservers);
 });
+
+function updateIndicatorsVisibility(): void {
+    Page.Canvas.setIndicatorsVisibility(Page.Checkbox.isChecked(controlId.SHOW_INDICATORS_CHECKBOX));
+}
+Page.Checkbox.addObserver(controlId.SHOW_INDICATORS_CHECKBOX, updateIndicatorsVisibility);
+updateIndicatorsVisibility();
 
 export {
     EHeightmapMode,

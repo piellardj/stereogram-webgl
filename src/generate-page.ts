@@ -16,7 +16,20 @@ const data = {
         "script/gl-matrix-2.5.1-min.js",
         "script/main.min.js"
     ],
-    indicators: [],
+    indicators: [
+        {
+            id: "fps-indicator",
+            label: "FPS"
+        },
+        {
+            id: "stripes-count-indicator",
+            label: "Stripes count"
+        },
+        {
+            id: "tilesize-indicator",
+            label: "Tile size"
+        },
+    ],
     canvas: {
         width: 512,
         height: 512,
@@ -227,6 +240,12 @@ const data = {
         {
             title: "Output",
             controls: [
+                {
+                    type: Demopage.supportedControls.Checkbox,
+                    title: "Show indicators",
+                    id: "show-indicators-checkbox-id",
+                    checked: false,
+                },
                 {
                     type: Demopage.supportedControls.FileDownload,
                     id: "image-download-id",

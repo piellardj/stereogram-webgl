@@ -32,6 +32,17 @@ function main(): void {
     const heightmap = new Heightmap();
     const tile = new Tile();
 
+    let nbFramesSinceLastUpdate = 0;
+    setInterval(() => {
+        Page.Canvas.setIndicatorText("fps-indicator", Math.round(nbFramesSinceLastUpdate).toFixed(0));
+        nbFramesSinceLastUpdate = 0;
+
+        const currentTile = tile.current.texture;
+        Page.Canvas.setIndicatorText("tilesize-indicator", `${currentTile.width}x${currentTile.height}`);
+
+        Page.Canvas.setIndicatorText("stripes-count-indicator", engine.stripesCount.toFixed(0));
+    }, 1000);
+
     let needToDownload = false;
     Parameters.imageDownloadObservers.push(() => { needToDownload = true; });
 
@@ -42,6 +53,8 @@ function main(): void {
     Parameters.recomputeNoiseTileObservers.push(() => { needToRecomputeNoiseTile = true; });
 
     function mainLoop(): void {
+        nbFramesSinceLastUpdate++;
+
         if (needToDownload) {
             // redraw before resizing the canvas because the download pane might open, which changes the canvas size
             engine.draw(heightmap, tile); // redraw because preserveDrawingBuffer is false

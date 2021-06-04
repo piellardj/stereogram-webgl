@@ -14,7 +14,7 @@ class Engine {
     private stereogramShader: Shader;
     private heightmapShader: Shader;
 
-    private stripesCount: number = 16;
+    public stripesCount: number = 16;
 
     public constructor() {
         this.fullscreenVBO = VBO.createQuad(gl, -1, -1, 1, 1);
