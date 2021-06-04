@@ -80,7 +80,7 @@ class Engine {
             shader.bindUniformsAndAttributes();
             gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
-            return heightmapTexture.loaded && currentTile.texture.loaded;
+            return true;
         }
 
         return false;

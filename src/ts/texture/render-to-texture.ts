@@ -1,12 +1,10 @@
 import { gl } from "../gl-utils/gl-canvas";
-import { IAsyncTexture } from "./i-texture";
+import { ITexture } from "./i-texture";
 
 
-class RenderToTexture implements IAsyncTexture {
+class RenderToTexture implements ITexture {
     public readonly texture: WebGLTexture;
     public readonly framebuffer: WebGLFramebuffer;
-
-    public loaded: boolean = false;
 
     private _width: number;
     private _height: number;

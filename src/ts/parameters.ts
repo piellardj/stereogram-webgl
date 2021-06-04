@@ -1,3 +1,5 @@
+import * as Loader from "./loader";
+
 import "./page-interface-generated";
 
 
@@ -52,19 +54,16 @@ enum EHeightmapMode {
 }
 
 abstract class Parameters {
-    public static readonly tileUploadObservers: ImageUploadObserver[] = [];
+    public static readonly tileChangeObservers: ImageUploadObserver[] = [];
+    public static readonly heightmapChangeObservers: ImageUploadObserver[] = [];
+
     public static readonly redrawObservers: Observer[] = [];
     public static readonly recomputeNoiseTileObservers: Observer[] = [];
-
-    public static readonly heightmapUploadObservers: ImageUploadObserver[] = [];
 
     public static readonly imageDownloadObservers: Observer[] = [];
 
     public static get tileMode(): ETileMode {
         return Page.Tabs.getValues(controlId.TILE_MODE_TABS)[0] as ETileMode;
-    }
-    public static get tilePreset(): string {
-        return Page.Select.getValue(controlId.TILE_PRESET_SELECT);
     }
     public static get noiseTileResolution(): number {
         return Page.Range.getValue(controlId.TILE_NOISE_RESOLUTION);
@@ -82,9 +81,6 @@ abstract class Parameters {
     public static get heightmapMode(): EHeightmapMode {
         return Page.Tabs.getValues(controlId.HEIGHTMAP_MODE_TABS)[0] as EHeightmapMode;
     }
-    public static get heightmapPreset(): string {
-        return Page.Select.getValue(controlId.HEIGHTMAP_PRESET_SELECT);
-    }
     public static get modelId(): string {
         return Page.Select.getValue(controlId.MODEL_PRESET_SELECT);
     }
@@ -97,6 +93,79 @@ abstract class Parameters {
     public static get showHeightmap(): boolean {
         return Page.Checkbox.isChecked(controlId.SHOW_HEIGHTMAP);
     }
+}
+
+function parseImageUpload(filesList: FileList, callback: (uploadedImage: HTMLImageElement) => unknown): void {
+    if (filesList.length === 1) {
+        const reader = new FileReader();
+        reader.onload = () => {
+            const image = new Image();
+            image.addEventListener("load", () => {
+                callback(image);
+            });
+            image.src = reader.result as string;
+        };
+        reader.readAsDataURL(filesList[0]);
+    }
+}
+
+function loadImage(url: string, callback: (loadedImage: HTMLImageElement) => unknown): void {
+    url += `?v=${Page.version}`;
+
+    Loader.registerLoadingObject(url);
+
+    const image = new Image();
+    image.addEventListener("load", () => {
+        Loader.registerLoadedObject(url);
+        callback(image);
+    });
+    image.src = url;
+}
+
+{
+    const onNewTileTexture = (image: HTMLImageElement) => {
+        for (const observer of Parameters.tileChangeObservers) {
+            observer(image);
+        }
+        callRedrawObservers();
+    };
+
+    Page.FileControl.addUploadObserver(controlId.TILE_UPLOAD_BUTTON, (filesList: FileList) => {
+        Page.Select.setValue(controlId.TILE_PRESET_SELECT, null);
+        parseImageUpload(filesList, onNewTileTexture);
+    });
+
+    const onTilePresetChange = () => {
+        const preset = Page.Select.getValue(controlId.TILE_PRESET_SELECT);
+        if (preset) {
+            loadImage(`resources/tiles/${preset}`, onNewTileTexture);
+        }
+    };
+    Page.Select.addObserver(controlId.TILE_PRESET_SELECT, onTilePresetChange);
+    onTilePresetChange();
+}
+
+{
+    const onNewHeightmapTexture = (image: HTMLImageElement) => {
+        for (const observer of Parameters.heightmapChangeObservers) {
+            observer(image);
+        }
+        callRedrawObservers();
+    };
+
+    Page.FileControl.addUploadObserver(controlId.HEIGHTMAP_UPLOAD_BUTTON, (filesList: FileList) => {
+        Page.Select.setValue(controlId.HEIGHTMAP_PRESET_SELECT, null);
+        parseImageUpload(filesList, onNewHeightmapTexture);
+    });
+
+    const onHeightmapPresetChange = () => {
+        const preset = Page.Select.getValue(controlId.HEIGHTMAP_PRESET_SELECT);
+        if (preset) {
+            loadImage(`resources/heightmaps/${preset}`, onNewHeightmapTexture);
+        }
+    };
+    Page.Select.addObserver(controlId.HEIGHTMAP_PRESET_SELECT, onHeightmapPresetChange);
+    onHeightmapPresetChange();
 }
 
 function updateTileNoiseControlsVisibility(): void {
@@ -125,30 +194,7 @@ Page.Tabs.addObserver(controlId.HEIGHTMAP_MODE_TABS, () => {
 });
 updateTileNoiseControlsVisibility();
 
-function imageUploadObserver(observers: ImageUploadObserver[]): (filesList: FileList) => unknown {
-    return (filesList: FileList) => {
-        if (filesList.length === 1) {
-            const reader = new FileReader();
-            reader.onload = () => {
-                const image = new Image();
-                image.addEventListener("load", () => {
-                    for (const observer of observers) {
-                        observer(image);
-                    }
-                    callRedrawObservers();
-                });
-                image.src = reader.result as string;
-            };
-            reader.readAsDataURL(filesList[0]);
-        }
-    };
-}
-
-Page.FileControl.addUploadObserver(controlId.TILE_UPLOAD_BUTTON, imageUploadObserver(Parameters.tileUploadObservers));
-Page.FileControl.addUploadObserver(controlId.HEIGHTMAP_UPLOAD_BUTTON, imageUploadObserver(Parameters.heightmapUploadObservers));
-
 Page.Tabs.addObserver(controlId.HEIGHTMAP_MODE_TABS, callRedrawObservers);
-Page.Select.addObserver(controlId.HEIGHTMAP_PRESET_SELECT, callRedrawObservers);
 Page.Range.addObserver(controlId.DEPTH_RANGE, callRedrawObservers);
 Page.Checkbox.addObserver(controlId.HEIGHTMAP_INVERT_CHECKBOX, callRedrawObservers);
 Page.Checkbox.addObserver(controlId.SHOW_HEIGHTMAP, callRedrawObservers);
@@ -157,8 +203,6 @@ Page.Checkbox.addObserver(controlId.SHOW_UV, callRedrawObservers);
 Page.Range.addObserver(controlId.TILE_NOISE_RESOLUTION, callRecomputeNoiseTileObservers);
 Page.Checkbox.addObserver(controlId.TILE_NOISE_SQUARE, callRecomputeNoiseTileObservers);
 Page.Checkbox.addObserver(controlId.TILE_NOISE_COLORED, callRecomputeNoiseTileObservers);
-
-Page.Select.addObserver(controlId.TILE_PRESET_SELECT, callRedrawObservers);
 
 Page.FileControl.addDownloadObserver(controlId.IMAGE_DOWNLOAD, () => {
     callObservers(Parameters.imageDownloadObservers);

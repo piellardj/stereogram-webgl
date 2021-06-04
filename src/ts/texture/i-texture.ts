@@ -4,11 +4,6 @@ interface ITexture {
     height: number;
 }
 
-interface IAsyncTexture extends ITexture{
-    loaded: boolean;
-}
-
 export {
-    IAsyncTexture,
     ITexture,
 };
