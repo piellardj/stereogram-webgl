@@ -37,91 +37,6 @@ const data = {
     },
     controlsSections: [
         {
-            title: "Tile",
-            controls: [
-                {
-                    type: Demopage.supportedControls.Checkbox,
-                    title: "Show UV",
-                    id: "show-uv-checkbox-id",
-                    checked: false,
-                },
-                {
-                    type: Demopage.supportedControls.Tabs,
-                    title: "Mode",
-                    id: "tile-mode-tabs-id",
-                    unique: true,
-                    options: [
-                        {
-                            label: "Texture",
-                            value: "texture",
-                            checked: true,
-                        },
-                        {
-                            label: "Noise",
-                            value: "noise"
-                        },
-                    ]
-                },
-                {
-                    type: Demopage.supportedControls.Select,
-                    title: "Preset",
-                    id: "tile-preset-select-id",
-                    placeholder: "Custom",
-                    options: [
-                        {
-                            value: "wallpaper.png",
-                            label: "Wallpaper",
-                            checked: true,
-                        },
-                        {
-                            value: "foliage.png",
-                            label: "Foliage",
-                        },
-                        {
-                            value: "giraffe.png",
-                            label: "Giraffe",
-                        },
-                        {
-                            value: "stones.png",
-                            label: "Stones",
-                        },
-                        {
-                            value: "leaves.png",
-                            label: "Leaves",
-                        }
-                    ]
-                },
-                {
-                    type: Demopage.supportedControls.Range,
-                    title: "Resolution",
-                    id: "tile-noise-resolution-range-id",
-                    min: 8,
-                    max: 64,
-                    value: 16,
-                    step: 1
-                },
-                {
-                    type: Demopage.supportedControls.Checkbox,
-                    title: "Square",
-                    id: "tile-noise-square-checkbox-id",
-                    checked: true,
-                },
-                {
-                    type: Demopage.supportedControls.Checkbox,
-                    title: "Colored",
-                    id: "tile-noise-colored-checkbox-id",
-                    checked: true,
-                },
-                {
-                    type: Demopage.supportedControls.FileUpload,
-                    title: "Custom",
-                    id: "input-tile-upload-button",
-                    accept: [".png", ".jpg", ".bmp", ".webp"],
-                    defaultMessage: "Upload a pattern"
-                },
-            ]
-        },
-        {
             title: "Depth map",
             controls: [
                 {
@@ -250,6 +165,91 @@ const data = {
                     id: "input-heightmap-upload-button",
                     accept: [".png", ".jpg", ".bmp", ".webp"],
                     defaultMessage: "Upload a depth map"
+                },
+            ]
+        },
+        {
+            title: "Tile",
+            controls: [
+                {
+                    type: Demopage.supportedControls.Checkbox,
+                    title: "Show UV",
+                    id: "show-uv-checkbox-id",
+                    checked: false,
+                },
+                {
+                    type: Demopage.supportedControls.Tabs,
+                    title: "Mode",
+                    id: "tile-mode-tabs-id",
+                    unique: true,
+                    options: [
+                        {
+                            label: "Texture",
+                            value: "texture",
+                            checked: true,
+                        },
+                        {
+                            label: "Noise",
+                            value: "noise"
+                        },
+                    ]
+                },
+                {
+                    type: Demopage.supportedControls.Select,
+                    title: "Preset",
+                    id: "tile-preset-select-id",
+                    placeholder: "Custom",
+                    options: [
+                        {
+                            value: "wallpaper.png",
+                            label: "Wallpaper",
+                            checked: true,
+                        },
+                        {
+                            value: "foliage.png",
+                            label: "Foliage",
+                        },
+                        {
+                            value: "giraffe.png",
+                            label: "Giraffe",
+                        },
+                        {
+                            value: "stones.png",
+                            label: "Stones",
+                        },
+                        {
+                            value: "leaves.png",
+                            label: "Leaves",
+                        }
+                    ]
+                },
+                {
+                    type: Demopage.supportedControls.Range,
+                    title: "Resolution",
+                    id: "tile-noise-resolution-range-id",
+                    min: 8,
+                    max: 64,
+                    value: 16,
+                    step: 1
+                },
+                {
+                    type: Demopage.supportedControls.Checkbox,
+                    title: "Square",
+                    id: "tile-noise-square-checkbox-id",
+                    checked: true,
+                },
+                {
+                    type: Demopage.supportedControls.Checkbox,
+                    title: "Colored",
+                    id: "tile-noise-colored-checkbox-id",
+                    checked: true,
+                },
+                {
+                    type: Demopage.supportedControls.FileUpload,
+                    title: "Custom",
+                    id: "input-tile-upload-button",
+                    accept: [".png", ".jpg", ".bmp", ".webp"],
+                    defaultMessage: "Upload a pattern"
                 },
             ]
         },
