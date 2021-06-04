@@ -122,29 +122,34 @@ function loadImage(url: string, callback: (loadedImage: HTMLImageElement) => unk
     image.src = url;
 }
 
-{
-    const onNewTileTexture = (image: HTMLImageElement) => {
-        for (const observer of Parameters.tileChangeObservers) {
-            observer(image);
-        }
-        callRedrawObservers();
-    };
+function updateControlsVisibility(): void {
+    const isTileNoiseMode = (Parameters.tileMode === ETileMode.NOISE);
+    Page.Controls.setVisibility(controlId.TILE_NOISE_RESOLUTION, isTileNoiseMode);
+    Page.Controls.setVisibility(controlId.TILE_NOISE_COLORED, isTileNoiseMode);
+    Page.Controls.setVisibility(controlId.TILE_NOISE_SQUARE, isTileNoiseMode);
+    Page.Controls.setVisibility(controlId.TILE_PRESET_SELECT, !isTileNoiseMode);
+    Page.Controls.setVisibility(controlId.TILE_UPLOAD_BUTTON, !isTileNoiseMode);
 
-    Page.FileControl.addUploadObserver(controlId.TILE_UPLOAD_BUTTON, (filesList: FileList) => {
-        Page.Select.setValue(controlId.TILE_PRESET_SELECT, null);
-        parseImageUpload(filesList, onNewTileTexture);
-    });
-
-    const onTilePresetChange = () => {
-        const preset = Page.Select.getValue(controlId.TILE_PRESET_SELECT);
-        if (preset) {
-            loadImage(`resources/tiles/${preset}`, onNewTileTexture);
-        }
-    };
-    Page.Select.addObserver(controlId.TILE_PRESET_SELECT, onTilePresetChange);
-    onTilePresetChange();
+    const isMovingMode = (Parameters.heightmapMode === EHeightmapMode.MOVING);
+    Page.Controls.setVisibility(controlId.HEIGHTMAP_PRESET_SELECT, !isMovingMode);
+    Page.Controls.setVisibility(controlId.HEIGHTMAP_UPLOAD_BUTTON, !isMovingMode);
+    Page.Controls.setVisibility(controlId.MODEL_PRESET_SELECT, isMovingMode);
 }
 
+
+Page.Canvas.Observers.canvasResize.push(callRedrawObservers);
+Page.Checkbox.addObserver(controlId.SHOW_HEIGHTMAP, callRedrawObservers);
+Page.Range.addObserver(controlId.DEPTH_RANGE, callRedrawObservers);
+Page.Checkbox.addObserver(controlId.HEIGHTMAP_INVERT_CHECKBOX, callRedrawObservers);
+Page.Tabs.addObserver(controlId.HEIGHTMAP_MODE_TABS, () => {
+    if (Parameters.heightmapMode === EHeightmapMode.MOVING) {
+        Page.Tabs.setValues(controlId.TILE_MODE_TABS, [ETileMode.NOISE]);
+        Page.Tabs.clearStoredState(controlId.TILE_MODE_TABS);
+    }
+
+    updateControlsVisibility();
+    callRedrawObservers();
+});
 {
     const onNewHeightmapTexture = (image: HTMLImageElement) => {
         for (const observer of Parameters.heightmapChangeObservers) {
@@ -168,51 +173,51 @@ function loadImage(url: string, callback: (loadedImage: HTMLImageElement) => unk
     onHeightmapPresetChange();
 }
 
-function updateTileNoiseControlsVisibility(): void {
-    const isTileNoiseMode = (Parameters.tileMode === ETileMode.NOISE);
-    Page.Controls.setVisibility(controlId.TILE_NOISE_RESOLUTION, isTileNoiseMode);
-    Page.Controls.setVisibility(controlId.TILE_NOISE_COLORED, isTileNoiseMode);
-    Page.Controls.setVisibility(controlId.TILE_NOISE_SQUARE, isTileNoiseMode);
-    Page.Controls.setVisibility(controlId.TILE_PRESET_SELECT, !isTileNoiseMode);
-    Page.Controls.setVisibility(controlId.TILE_UPLOAD_BUTTON, !isTileNoiseMode);
 
-    const isMovingMode = (Parameters.heightmapMode === EHeightmapMode.MOVING);
-    Page.Controls.setVisibility(controlId.HEIGHTMAP_PRESET_SELECT, !isMovingMode);
-    Page.Controls.setVisibility(controlId.HEIGHTMAP_UPLOAD_BUTTON, !isMovingMode);
-    Page.Controls.setVisibility(controlId.MODEL_PRESET_SELECT, isMovingMode);
-}
-
-Page.Canvas.Observers.canvasResize.push(callRedrawObservers);
-
-Page.Tabs.addObserver(controlId.TILE_MODE_TABS, () => {
-    updateTileNoiseControlsVisibility();
-    callRedrawObservers();
-});
-Page.Tabs.addObserver(controlId.HEIGHTMAP_MODE_TABS, () => {
-    updateTileNoiseControlsVisibility();
-    callRedrawObservers();
-});
-updateTileNoiseControlsVisibility();
-
-Page.Tabs.addObserver(controlId.HEIGHTMAP_MODE_TABS, callRedrawObservers);
-Page.Range.addObserver(controlId.DEPTH_RANGE, callRedrawObservers);
-Page.Checkbox.addObserver(controlId.HEIGHTMAP_INVERT_CHECKBOX, callRedrawObservers);
-Page.Checkbox.addObserver(controlId.SHOW_HEIGHTMAP, callRedrawObservers);
 Page.Checkbox.addObserver(controlId.SHOW_UV, callRedrawObservers);
+Page.Tabs.addObserver(controlId.TILE_MODE_TABS, () => {
+    updateControlsVisibility();
+    callRedrawObservers();
+});
+{
+    const onNewTileTexture = (image: HTMLImageElement) => {
+        for (const observer of Parameters.tileChangeObservers) {
+            observer(image);
+        }
+        callRedrawObservers();
+    };
 
+    Page.FileControl.addUploadObserver(controlId.TILE_UPLOAD_BUTTON, (filesList: FileList) => {
+        Page.Select.setValue(controlId.TILE_PRESET_SELECT, null);
+        parseImageUpload(filesList, onNewTileTexture);
+    });
+
+    const onTilePresetChange = () => {
+        const preset = Page.Select.getValue(controlId.TILE_PRESET_SELECT);
+        if (preset) {
+            loadImage(`resources/tiles/${preset}`, onNewTileTexture);
+        }
+    };
+    Page.Select.addObserver(controlId.TILE_PRESET_SELECT, onTilePresetChange);
+    onTilePresetChange();
+}
 Page.Range.addObserver(controlId.TILE_NOISE_RESOLUTION, callRecomputeNoiseTileObservers);
 Page.Checkbox.addObserver(controlId.TILE_NOISE_SQUARE, callRecomputeNoiseTileObservers);
 Page.Checkbox.addObserver(controlId.TILE_NOISE_COLORED, callRecomputeNoiseTileObservers);
 
+
 Page.FileControl.addDownloadObserver(controlId.IMAGE_DOWNLOAD, () => {
     callObservers(Parameters.imageDownloadObservers);
 });
+
 
 function updateIndicatorsVisibility(): void {
     Page.Canvas.setIndicatorsVisibility(Page.Checkbox.isChecked(controlId.SHOW_INDICATORS_CHECKBOX));
 }
 Page.Checkbox.addObserver(controlId.SHOW_INDICATORS_CHECKBOX, updateIndicatorsVisibility);
 updateIndicatorsVisibility();
+
+updateControlsVisibility();
 
 export {
     EHeightmapMode,
