@@ -41,13 +41,6 @@ class Tile {
             };
         }
     }
-    public get currentTexture(): ImageTexture {
-        if (Parameters.tileMode === ETileMode.TEXTURE) {
-            return this.tileTexture;
-        } else {
-            return this.randomTexture;
-        }
-    }
 
     public randomize(width: number, height: number): boolean {
         const usefulWidth = width;
