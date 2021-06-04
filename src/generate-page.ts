@@ -171,19 +171,19 @@ const data = {
                         {
                             value: "grid.png",
                             label: "Grid",
-                            checked: true,
                         },
                         {
                             value: "planet.png",
                             label: "Planet",
-                        },
-                        {
-                            value: "hand.png",
-                            label: "Hand",
+                            checked: true,
                         },
                         {
                             value: "hello.png",
                             label: "Hello",
+                        },
+                        {
+                            value: "hand.png",
+                            label: "Hand",
                         },
                         {
                             value: "ripple.png",
@@ -194,12 +194,24 @@ const data = {
                             label: "Head",
                         },
                         {
-                            value: "dog.png",
-                            label: "Dog",
+                            value: "atomium.png",
+                            label: "Atomium",
                         },
                         {
                             value: "car.png",
                             label: "Car",
+                        },
+                        {
+                            value: "dolphin.png",
+                            label: "Dolphin",
+                        },
+                        {
+                            value: "tree.png",
+                            label: "Tree",
+                        },
+                        {
+                            value: "boat.png",
+                            label: "Boat",
                         }
                     ]
                 },
