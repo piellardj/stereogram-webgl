@@ -6,12 +6,17 @@ import { Heightmap } from "./heightmap";
 import { ETileMode, Parameters } from "./parameters";
 import { Tile } from "./tile";
 
-import { asyncLoadShader } from "./utils";
+import { asyncLoadShader, clamp } from "./utils";
+
+import * as StereogramShader from "./stereogram-shader";
+
 
 class Engine {
+    private static readonly MIN_STRIPES_COUNT: number = 8;
+    private static readonly MAX_STRIPES_COUNT: number = 24;
+
     private readonly fullscreenVBO: VBO;
 
-    private stereogramShader: Shader;
     private heightmapShader: Shader;
 
     public stripesCount: number = 16;
@@ -19,16 +24,7 @@ class Engine {
     public constructor() {
         this.fullscreenVBO = VBO.createQuad(gl, -1, -1, 1, 1);
 
-        asyncLoadShader("stereomap", "fullscreen.vert", "stereogram.frag", (shader: Shader) => {
-            shader.a["aCorner"].VBO = this.fullscreenVBO;
-            this.stereogramShader = shader;
-        }, {
-            STRIPES_COUNT: this.stripesCount.toFixed(1),
-            LOOP_SIZE: Math.ceil(1.5 * this.stripesCount).toFixed(0),
-        });
-
         asyncLoadShader("heightmap", "fullscreen.vert", "heightmap.frag", (shader: Shader) => {
-            shader.a["aCorner"].VBO = this.fullscreenVBO;
             this.heightmapShader = shader;
         });
     }
@@ -41,7 +37,10 @@ class Engine {
         if (Parameters.showHeightmap) {
             shader = this.heightmapShader;
         } else {
-            if (this.stereogramShader) {
+            this.stripesCount = this.computeIdealStripeCount();
+            shader = StereogramShader.getShader(this.stripesCount);
+
+            if (shader) {
                 const tileUsefulWidth = currentTile.texture.width - 2 * currentTile.padding;
                 const tileUsefulHeight = currentTile.texture.height - 2 * currentTile.padding;
 
@@ -49,13 +48,11 @@ class Engine {
                 const tileHeightInPixel = tileWidthInPixel / (tileUsefulWidth / tileUsefulHeight);
                 const tileHeight = tileHeightInPixel / gl.canvas.height;
 
-                this.stereogramShader.u["uTileTexture"].value = currentTile.texture.id;
-                this.stereogramShader.u["uTileColor"].value = (Parameters.tileMode === ETileMode.NOISE && !Parameters.noiseTileColored) ? 0 : 1;
-                this.stereogramShader.u["uTileHeight"].value = tileHeight;
-                this.stereogramShader.u["uTileScaling"].value = [tileUsefulWidth / currentTile.texture.width, tileUsefulHeight / currentTile.texture.height];
-                this.stereogramShader.u["uShowUV"].value = Parameters.showUV ? 1 : 0;
-
-                shader = this.stereogramShader;
+                shader.u["uTileTexture"].value = currentTile.texture.id;
+                shader.u["uTileColor"].value = (Parameters.tileMode === ETileMode.NOISE && !Parameters.noiseTileColored) ? 0 : 1;
+                shader.u["uTileHeight"].value = tileHeight;
+                shader.u["uTileScaling"].value = [tileUsefulWidth / currentTile.texture.width, tileUsefulHeight / currentTile.texture.height];
+                shader.u["uShowUV"].value = Parameters.showUV ? 1 : 0;
             }
         }
 
@@ -64,6 +61,7 @@ class Engine {
             gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
             gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT); // tslint:disable-line:no-bitwise
 
+            shader.a["aCorner"].VBO = this.fullscreenVBO;
             shader.u["uHeightmapTexture"].value = heightmapTexture.id;
             shader.u["uInvertHeightmap"].value = Parameters.invertHeightmap;
             shader.u["uDepthFactor"].value = Parameters.depth;
@@ -84,6 +82,15 @@ class Engine {
         }
 
         return false;
+    }
+
+    private computeIdealStripeCount(): number {
+        if (Parameters.stripesAuto) {
+            const idealCount = Math.round(gl.canvas.width / 80);
+            return clamp(Engine.MIN_STRIPES_COUNT, Engine.MAX_STRIPES_COUNT, idealCount);
+        } else {
+            return Parameters.stripesCount;
+        }
     }
 }
 

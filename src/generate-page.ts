@@ -254,6 +254,26 @@ const data = {
             ]
         },
         {
+            title: "Stripes",
+            controls: [
+                {
+                    type: Demopage.supportedControls.Checkbox,
+                    title: "Auto",
+                    id: "stripes-auto-checkbox-id",
+                    checked: true,
+                },
+                {
+                    type: Demopage.supportedControls.Range,
+                    title: "Stripes count",
+                    id: "stripes-count-range-id",
+                    min: 8,
+                    max: 24,
+                    value: 16,
+                    step: 1
+                },
+            ]
+        },
+        {
             title: "Output",
             controls: [
                 {

@@ -21,6 +21,9 @@ const controlId = {
     SHOW_HEIGHTMAP: "show-heightmap-checkbox-id",
     HEIGHTMAP_UPLOAD_BUTTON: "input-heightmap-upload-button",
 
+    STRIPES_AUTO_CHECKBOX: "stripes-auto-checkbox-id",
+    STRIPES_COUNT_RANGE: "stripes-count-range-id",
+
     SHOW_INDICATORS_CHECKBOX: "show-indicators-checkbox-id",
     IMAGE_DOWNLOAD: "image-download-id",
 };
@@ -92,6 +95,13 @@ abstract class Parameters {
     }
     public static get showHeightmap(): boolean {
         return Page.Checkbox.isChecked(controlId.SHOW_HEIGHTMAP);
+    }
+
+    public static get stripesAuto(): boolean {
+        return Page.Checkbox.isChecked(controlId.STRIPES_AUTO_CHECKBOX);
+    }
+    public static get stripesCount(): number {
+        return Page.Range.getValue(controlId.STRIPES_COUNT_RANGE);
     }
 }
 
@@ -210,6 +220,21 @@ Page.Tabs.addObserver(controlId.TILE_MODE_TABS, () => {
 Page.Range.addObserver(controlId.TILE_NOISE_RESOLUTION, callRecomputeNoiseTileObservers);
 Page.Checkbox.addObserver(controlId.TILE_NOISE_SQUARE, callRecomputeNoiseTileObservers);
 Page.Checkbox.addObserver(controlId.TILE_NOISE_COLORED, callRecomputeNoiseTileObservers);
+
+
+{
+    const updateStripesControlsVisibility = () => {
+        const isAutoMode = Page.Checkbox.isChecked(controlId.STRIPES_AUTO_CHECKBOX);
+        Page.Controls.setVisibility(controlId.STRIPES_COUNT_RANGE, !isAutoMode);
+    };
+    const onStripesChange = () => {
+        updateStripesControlsVisibility();
+        callRedrawObservers();
+    };
+    Page.Checkbox.addObserver(controlId.STRIPES_AUTO_CHECKBOX, onStripesChange);
+    Page.Range.addObserver(controlId.STRIPES_COUNT_RANGE, onStripesChange);
+    updateStripesControlsVisibility();
+}
 
 
 Page.FileControl.addDownloadObserver(controlId.IMAGE_DOWNLOAD, () => {

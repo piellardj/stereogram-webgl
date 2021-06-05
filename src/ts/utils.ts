@@ -47,7 +47,17 @@ function createImageData(width: number, height: number, data: Uint8ClampedArray)
     }
 }
 
+function clamp(min: number, max: number, x: number): number {
+    if (x < min) {
+        return min;
+    } else if (x > max) {
+        return max;
+    }
+    return x;
+}
+
 export {
     asyncLoadShader,
+    clamp,
     createImageData,
 };
