@@ -10,7 +10,7 @@ interface IScenePreset {
     cameraPosition: [number, number, number];
     nearPlane: number;
     farPlane: number;
-    model?: ObjModel;
+    model?: ObjModel; // "undefined" if not loaded, null if loading, ObjModel if loaded
 }
 
 const presets: { [id: string]: IScenePreset } = {
@@ -93,8 +93,11 @@ class Scene {
 
             if (typeof modelPreset.model === "undefined") {
                 modelPreset.model = null;
+                const loadedModelId = Parameters.modelId;
                 asyncLoadObjModel(modelPreset.modelName, (model: ObjModel) => {
-                    modelPreset.model = model;
+                    if (loadedModelId === Parameters.modelId) { // this method is called asynchronously, so check that this is still the model we want
+                        modelPreset.model = model;
+                    }
                 });
             }
 
