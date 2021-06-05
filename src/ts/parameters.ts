@@ -151,22 +151,25 @@ Page.Tabs.addObserver(controlId.HEIGHTMAP_MODE_TABS, () => {
     callRedrawObservers();
 });
 {
-    const onNewHeightmapTexture = (image: HTMLImageElement) => {
-        for (const observer of Parameters.heightmapChangeObservers) {
-            observer(image);
+    const onNewHeightmapTexture = (onlyIfPresetIs: string | null, image: HTMLImageElement) => {
+        const preset = Page.Select.getValue(controlId.HEIGHTMAP_PRESET_SELECT);
+        if (preset === onlyIfPresetIs) { // this method is call asynchronously, so check that the current preset is still the same
+            for (const observer of Parameters.heightmapChangeObservers) {
+                observer(image);
+            }
+            callRedrawObservers();
         }
-        callRedrawObservers();
     };
 
     Page.FileControl.addUploadObserver(controlId.HEIGHTMAP_UPLOAD_BUTTON, (filesList: FileList) => {
         Page.Select.setValue(controlId.HEIGHTMAP_PRESET_SELECT, null);
-        parseImageUpload(filesList, onNewHeightmapTexture);
+        parseImageUpload(filesList, onNewHeightmapTexture.bind(null, null));
     });
 
     const onHeightmapPresetChange = () => {
         const preset = Page.Select.getValue(controlId.HEIGHTMAP_PRESET_SELECT);
         if (preset) {
-            loadImage(`resources/heightmaps/${preset}`, onNewHeightmapTexture);
+            loadImage(`resources/heightmaps/${preset}`, onNewHeightmapTexture.bind(null, preset));
         }
     };
     Page.Select.addObserver(controlId.HEIGHTMAP_PRESET_SELECT, onHeightmapPresetChange);
@@ -180,22 +183,25 @@ Page.Tabs.addObserver(controlId.TILE_MODE_TABS, () => {
     callRedrawObservers();
 });
 {
-    const onNewTileTexture = (image: HTMLImageElement) => {
-        for (const observer of Parameters.tileChangeObservers) {
-            observer(image);
+    const onNewTileTexture = (onlyIfPresetIs: string | null, image: HTMLImageElement) => {
+        const preset = Page.Select.getValue(controlId.TILE_PRESET_SELECT);
+        if (preset === onlyIfPresetIs) { // this method is call asynchronously, so check that the current preset is still the same
+            for (const observer of Parameters.tileChangeObservers) {
+                observer(image);
+            }
+            callRedrawObservers();
         }
-        callRedrawObservers();
     };
 
     Page.FileControl.addUploadObserver(controlId.TILE_UPLOAD_BUTTON, (filesList: FileList) => {
         Page.Select.setValue(controlId.TILE_PRESET_SELECT, null);
-        parseImageUpload(filesList, onNewTileTexture);
+        parseImageUpload(filesList, onNewTileTexture.bind(null, null));
     });
 
     const onTilePresetChange = () => {
         const preset = Page.Select.getValue(controlId.TILE_PRESET_SELECT);
         if (preset) {
-            loadImage(`resources/tiles/${preset}`, onNewTileTexture);
+            loadImage(`resources/tiles/${preset}`, onNewTileTexture.bind(null, preset));
         }
     };
     Page.Select.addObserver(controlId.TILE_PRESET_SELECT, onTilePresetChange);
