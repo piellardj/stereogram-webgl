@@ -84,17 +84,17 @@ const data = {
                     placeholder: "Custom",
                     options: [
                         {
-                            value: "grid.png",
-                            label: "Grid",
-                        },
-                        {
                             value: "planet.png",
                             label: "Planet",
                             checked: true,
                         },
                         {
-                            value: "hello.png",
-                            label: "Hello",
+                            value: "bumps.png",
+                            label: "Bumps",
+                        },
+                        {
+                            value: "smile.png",
+                            label: "Smile",
                         },
                         {
                             value: "hand.png",
@@ -125,8 +125,8 @@ const data = {
                             label: "Tree",
                         },
                         {
-                            value: "boat.png",
-                            label: "Boat",
+                            value: "ship.png",
+                            label: "Ship",
                         }
                     ]
                 },
