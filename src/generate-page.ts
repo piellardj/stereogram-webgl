@@ -203,12 +203,12 @@ const data = {
                         {
                             value: "wallpaper.png",
                             label: "Wallpaper",
-                            checked: true,
                         },
-
+                        
                         {
                             value: "space.png",
-                            label: "Space"
+                            label: "Space",
+                            checked: true,
                         },
                         {
                             value: "foliage.png",
