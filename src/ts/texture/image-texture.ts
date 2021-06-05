@@ -1,4 +1,5 @@
 import { gl } from "../gl-utils/gl-canvas";
+
 import { createImageData } from "../utils";
 import { ITexture } from "./i-texture";
 
@@ -41,3 +42,4 @@ class ImageTexture implements ITexture {
 export {
     ImageTexture,
 };
+

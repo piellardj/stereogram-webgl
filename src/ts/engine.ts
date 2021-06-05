@@ -1,14 +1,12 @@
 import { gl } from "./gl-utils/gl-canvas";
 import { Shader } from "./gl-utils/shader";
 import { VBO } from "./gl-utils/vbo";
+
 import { Heightmap } from "./heightmap";
-
 import { ETileMode, Parameters } from "./parameters";
-import { Tile } from "./tile";
-
-import { asyncLoadShader, clamp } from "./utils";
-
 import * as StereogramShader from "./stereogram-shader";
+import { Tile } from "./tile";
+import { asyncLoadShader, clamp } from "./utils";
 
 
 class Engine {
@@ -97,3 +95,4 @@ class Engine {
 export {
     Engine,
 };
+

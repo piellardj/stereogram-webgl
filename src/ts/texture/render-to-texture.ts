@@ -1,4 +1,5 @@
 import { gl } from "../gl-utils/gl-canvas";
+
 import { ITexture } from "./i-texture";
 
 
@@ -60,3 +61,4 @@ class RenderToTexture implements ITexture {
 export {
     RenderToTexture,
 };
+

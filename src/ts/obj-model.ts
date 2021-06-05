@@ -2,6 +2,7 @@ import { gl } from "./gl-utils/gl-canvas";
 import { VBO } from "./gl-utils/vbo";
 import * as Loader from "./loader";
 
+
 interface IPoint {
     x: number;
     y: number;
@@ -117,3 +118,4 @@ export {
     asyncLoadObjModel,
     ObjModel,
 };
+

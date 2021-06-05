@@ -1,9 +1,11 @@
 import { gl } from "./gl-utils/gl-canvas";
 import { Shader } from "./gl-utils/shader";
+
 import { asyncLoadObjModel, ObjModel } from "./obj-model";
 import { Parameters } from "./parameters";
 import { RenderToTextureWithDepth } from "./texture/render-to-texture-with-depth";
 import { asyncLoadShader } from "./utils";
+
 
 interface IScenePreset {
     modelName: string;
@@ -121,3 +123,4 @@ class Scene {
 export {
     Scene,
 };
+

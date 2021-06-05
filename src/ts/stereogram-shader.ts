@@ -2,6 +2,7 @@ import { Shader } from "./gl-utils/shader";
 
 import { asyncLoadShader } from "./utils";
 
+
 type IShaderCollection = { [stripesCount: number]: Shader | null };
 
 const shadersCollection: IShaderCollection = {};
@@ -26,3 +27,4 @@ function getShader(stripesCount: number): Shader | null {
 export {
     getShader,
 };
+

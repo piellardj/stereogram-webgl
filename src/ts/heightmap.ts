@@ -1,8 +1,10 @@
 import { gl } from "./gl-utils/gl-canvas";
-import { ImageTexture } from "./texture/image-texture";
+
 import { EHeightmapMode, Parameters } from "./parameters";
 import { Scene } from "./scene";
 import { ITexture } from "./texture/i-texture";
+import { ImageTexture } from "./texture/image-texture";
+
 
 class Heightmap {
     private readonly heightmapTexture: ImageTexture;
@@ -32,3 +34,4 @@ class Heightmap {
 export {
     Heightmap,
 };
+

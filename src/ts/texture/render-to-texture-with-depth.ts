@@ -1,4 +1,5 @@
 import { gl } from "../gl-utils/gl-canvas";
+
 import { RenderToTexture } from "./render-to-texture";
 
 import "../page-interface-generated";
@@ -39,3 +40,4 @@ class RenderToTextureWithDepth extends RenderToTexture {
 export {
     RenderToTextureWithDepth,
 };
+

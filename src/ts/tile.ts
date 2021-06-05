@@ -2,6 +2,7 @@ import { ETileMode, Parameters } from "./parameters";
 import { ImageTexture } from "./texture/image-texture";
 import { createImageData } from "./utils";
 
+
 interface ITileTexture {
     texture: ImageTexture;
     padding: number;
@@ -85,3 +86,4 @@ class Tile {
 export {
     Tile,
 };
+

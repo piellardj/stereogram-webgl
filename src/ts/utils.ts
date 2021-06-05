@@ -1,6 +1,8 @@
 import { Shader } from "./gl-utils/shader";
-import * as Loader from "./loader";
 import * as ShaderManager from "./gl-utils/shader-manager";
+
+import * as Loader from "./loader";
+
 
 function asyncLoadShader(name: string, vertexFilename: string, fragmentFilename: string, callback: (shader: Shader) => unknown, injected: any = {}): void {
     const id = `shader-${name}`;
@@ -61,3 +63,4 @@ export {
     clamp,
     createImageData,
 };
+
