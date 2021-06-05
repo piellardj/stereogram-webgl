@@ -188,6 +188,7 @@ Page.Tabs.addObserver(controlId.HEIGHTMAP_MODE_TABS, () => {
     const onHeightmapPresetChange = () => {
         const preset = Page.Select.getValue(controlId.HEIGHTMAP_PRESET_SELECT);
         if (preset) {
+            Page.FileControl.clearFileUpload(controlId.HEIGHTMAP_UPLOAD_BUTTON);
             loadImage(`resources/heightmaps/${preset}`, onNewHeightmapTexture.bind(null, preset));
         }
     };
@@ -220,6 +221,7 @@ Page.Tabs.addObserver(controlId.TILE_MODE_TABS, () => {
     const onTilePresetChange = () => {
         const preset = Page.Select.getValue(controlId.TILE_PRESET_SELECT);
         if (preset) {
+            Page.FileControl.clearFileUpload(controlId.TILE_UPLOAD_BUTTON);
             loadImage(`resources/tiles/${preset}`, onNewTileTexture.bind(null, preset));
         }
     };
