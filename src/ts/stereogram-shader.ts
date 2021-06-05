@@ -17,7 +17,7 @@ function getShader(stripesCount: number): Shader | null {
             shadersCollection[stripesCount] = loadedShader;
         }, {
             STRIPES_COUNT: stripesCount.toFixed(1),
-            LOOP_SIZE: Math.ceil(1.5 * stripesCount).toFixed(0),
+            LOOP_SIZE: Math.ceil(2 * stripesCount).toFixed(0),
         });
     }
 
