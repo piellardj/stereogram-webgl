@@ -139,11 +139,11 @@ const data = {
                         {
                             value: "primitives",
                             label: "Primitives",
+                            checked: true,
                         },
                         {
                             value: "cube",
                             label: "Cube",
-                            checked: true,
                         },
                         {
                             value: "monkey",
