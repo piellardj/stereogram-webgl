@@ -205,6 +205,11 @@ const data = {
                             label: "Wallpaper",
                             checked: true,
                         },
+
+                        {
+                            value: "space.png",
+                            label: "Space"
+                        },
                         {
                             value: "foliage.png",
                             label: "Foliage",
