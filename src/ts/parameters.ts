@@ -21,7 +21,8 @@ const controlId = {
     SHOW_HEIGHTMAP: "show-heightmap-checkbox-id",
     HEIGHTMAP_UPLOAD_BUTTON: "input-heightmap-upload-button",
 
-    STRIPES_AUTO_CHECKBOX: "stripes-auto-checkbox-id",
+    STRIPES_MODE_TABS: "stripes-mode-tabs-id",
+    STRIPES_WIDTH_RANGE: "stripes-width-range-id",
     STRIPES_COUNT_RANGE: "stripes-count-range-id",
 
     SHOW_INDICATORS_CHECKBOX: "show-indicators-checkbox-id",
@@ -54,6 +55,11 @@ enum ETileMode {
 enum EHeightmapMode {
     STILL = "still",
     MOVING = "moving",
+}
+
+enum EStripesMode {
+    ADAPTATIVE = "adaptative",
+    FIXED = "fixed",
 }
 
 abstract class Parameters {
@@ -97,11 +103,14 @@ abstract class Parameters {
         return Page.Checkbox.isChecked(controlId.SHOW_HEIGHTMAP);
     }
 
-    public static get stripesAuto(): boolean {
-        return Page.Checkbox.isChecked(controlId.STRIPES_AUTO_CHECKBOX);
+    public static get stripesMode(): EStripesMode {
+        return Page.Tabs.getValues(controlId.STRIPES_MODE_TABS)[0] as EStripesMode;
     }
     public static get stripesCount(): number {
         return Page.Range.getValue(controlId.STRIPES_COUNT_RANGE);
+    }
+    public static get stripesWidth(): number {
+        return Page.Range.getValue(controlId.STRIPES_WIDTH_RANGE);
     }
 }
 
@@ -224,15 +233,17 @@ Page.Checkbox.addObserver(controlId.TILE_NOISE_COLORED, callRecomputeNoiseTileOb
 
 {
     const updateStripesControlsVisibility = () => {
-        const isAutoMode = Page.Checkbox.isChecked(controlId.STRIPES_AUTO_CHECKBOX);
-        Page.Controls.setVisibility(controlId.STRIPES_COUNT_RANGE, !isAutoMode);
+        const isAdaptativeMode = Parameters.stripesMode === EStripesMode.ADAPTATIVE;
+        Page.Controls.setVisibility(controlId.STRIPES_COUNT_RANGE, !isAdaptativeMode);
+        Page.Controls.setVisibility(controlId.STRIPES_WIDTH_RANGE, isAdaptativeMode);
     };
     const onStripesChange = () => {
         updateStripesControlsVisibility();
         callRedrawObservers();
     };
-    Page.Checkbox.addObserver(controlId.STRIPES_AUTO_CHECKBOX, onStripesChange);
+    Page.Tabs.addObserver(controlId.STRIPES_MODE_TABS, onStripesChange);
     Page.Range.addObserver(controlId.STRIPES_COUNT_RANGE, onStripesChange);
+    Page.Range.addObserver(controlId.STRIPES_WIDTH_RANGE, onStripesChange);
     updateStripesControlsVisibility();
 }
 
@@ -252,6 +263,7 @@ updateControlsVisibility();
 
 export {
     EHeightmapMode,
+    EStripesMode,
     ETileMode,
     Parameters,
 };

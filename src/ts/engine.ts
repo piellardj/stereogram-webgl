@@ -3,7 +3,7 @@ import { Shader } from "./gl-utils/shader";
 import { VBO } from "./gl-utils/vbo";
 
 import { Heightmap } from "./heightmap";
-import { ETileMode, Parameters } from "./parameters";
+import { EStripesMode, ETileMode, Parameters } from "./parameters";
 import * as StereogramShader from "./stereogram-shader";
 import { Tile } from "./tile";
 import { asyncLoadShader, clamp } from "./utils";
@@ -83,8 +83,8 @@ class Engine {
     }
 
     private computeIdealStripeCount(): number {
-        if (Parameters.stripesAuto) {
-            const idealCount = Math.round(gl.canvas.width / 80);
+        if (Parameters.stripesMode === EStripesMode.ADAPTATIVE) {
+            const idealCount = Math.round(gl.canvas.width / Parameters.stripesWidth);
             return clamp(Engine.MIN_STRIPES_COUNT, Engine.MAX_STRIPES_COUNT, idealCount);
         } else {
             return Parameters.stripesCount;

@@ -257,10 +257,30 @@ const data = {
             title: "Stripes",
             controls: [
                 {
-                    type: Demopage.supportedControls.Checkbox,
-                    title: "Auto",
-                    id: "stripes-auto-checkbox-id",
-                    checked: true,
+                    type: Demopage.supportedControls.Tabs,
+                    title: "Mode",
+                    id: "stripes-mode-tabs-id",
+                    unique: true,
+                    options: [
+                        {
+                            value: "adaptative",
+                            label: "Adaptative",
+                            checked: true,
+                        },
+                        {
+                            value: "fixed",
+                            label: "Fixed",
+                        },
+                    ]
+                },
+                {
+                    type: Demopage.supportedControls.Range,
+                    title: "Stripes width",
+                    id: "stripes-width-range-id",
+                    min: 20,
+                    max: 200,
+                    value: 80,
+                    step: 1
                 },
                 {
                     type: Demopage.supportedControls.Range,
