@@ -17,7 +17,7 @@ class Engine {
 
     private heightmapShader: Shader;
 
-    public stripesCount: number = 16;
+    public stripesCount: number;
 
     public constructor() {
         this.fullscreenVBO = VBO.createQuad(gl, -1, -1, 1, 1);
