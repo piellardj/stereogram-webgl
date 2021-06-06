@@ -7,7 +7,7 @@ const data = {
     title: "Stereogram",
     description: "Stereogram (aka Magic Eye) online generator running on GPU with WebGL.",
     introduction: [
-        "An autostereogram (also known as Magic Eye) is a 2D image designed to create the illusion of 3D. In each image, there is a 3D object that can only be viewed by looking through the image, as if the screen was transparent and you looked at the wall behind it. It gets easier with practice.",
+        "An autostereogram (also known as Magic Eye) is a 2D image designed to create the illusion of 3D. In each image, there is a 3D object that can only be viewed by looking at the image a certain way, as if the screen was transparent and you looked at the wall behind it. It gets easier with practice.",
         "Autostereograms were very popular in the '90s. They take advantage of stereopsis: the brain tries to reconstruct depth by combining the two slightly different images perceived by each eye.",
         "In this project, you can use your own depth map, customize the tiles as well as the way the image is computed. It all runs on GPU and can also handle live moving scenes in real time."
     ],
