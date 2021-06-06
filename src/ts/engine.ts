@@ -31,11 +31,15 @@ class Engine {
         const currentTile = tile.current;
         const heightmapTexture = heightmap.current;
 
+        this.stripesCount = this.computeIdealStripeCount();
+        const usefulStripesProportion = this.stripesCount / (this.stripesCount + 1);
+        let heightmapHScaling = 1;
+
         let shader: Shader;
         if (Parameters.showHeightmap) {
             shader = this.heightmapShader;
+            heightmapHScaling = usefulStripesProportion;
         } else {
-            this.stripesCount = this.computeIdealStripeCount();
             shader = StereogramShader.getShader(this.stripesCount);
 
             if (shader) {
@@ -64,12 +68,12 @@ class Engine {
             shader.u["uInvertHeightmap"].value = Parameters.invertHeightmap;
             shader.u["uDepthFactor"].value = Parameters.depth;
 
-            const canvasAspectRatio = gl.canvas.width / gl.canvas.height;
+            const canvasAspectRatio = (gl.canvas.width * usefulStripesProportion) / gl.canvas.height;
             const heightmapAspectRatio = heightmapTexture.width / heightmapTexture.height;
             if (canvasAspectRatio > heightmapAspectRatio) {
-                shader.u["uHeightmapScaling"].value = [canvasAspectRatio / heightmapAspectRatio, 1];
+                shader.u["uHeightmapScaling"].value = [canvasAspectRatio / heightmapAspectRatio / heightmapHScaling, 1];
             } else {
-                shader.u["uHeightmapScaling"].value = [1, heightmapAspectRatio / canvasAspectRatio];
+                shader.u["uHeightmapScaling"].value = [1 / heightmapHScaling, heightmapAspectRatio / canvasAspectRatio];
             }
 
             shader.use();
