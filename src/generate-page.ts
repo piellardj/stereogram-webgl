@@ -172,12 +172,6 @@ const data = {
             title: "Tile",
             controls: [
                 {
-                    type: Demopage.supportedControls.Checkbox,
-                    title: "Show UV",
-                    id: "show-uv-checkbox-id",
-                    checked: false,
-                },
-                {
                     type: Demopage.supportedControls.Tabs,
                     title: "Mode",
                     id: "tile-mode-tabs-id",
@@ -261,6 +255,12 @@ const data = {
         {
             title: "Stripes",
             controls: [
+                {
+                    type: Demopage.supportedControls.Checkbox,
+                    title: "Show UV",
+                    id: "show-uv-checkbox-id",
+                    checked: false,
+                },
                 {
                     type: Demopage.supportedControls.Tabs,
                     title: "Mode",
