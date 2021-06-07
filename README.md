@@ -1,5 +1,5 @@
 # stereogram-webgl
-An autostereogram (also known as Magic Eye) is a 2D image designed to create the illusion of 3D. In each image, there is a 3D object that can only be viewed by looking through the image, as if the screen was transparent and you looked at the wall behind it. It gets easier with practice.
+An autostereogram (also known as Magic Eye) is a 2D image designed to create the illusion of 3D. In each image, there is a 3D object that can only be viewed by looking at the image a certain way, as if the screen was transparent and you looked at the wall behind it. It gets easier with practice.
 
 Autostereograms were very popular in the '90s. They take advantage of stereopsis: the brain tries to reconstruct depth by combining the two slightly different images perceived by each eye.
 
@@ -78,13 +78,13 @@ Now let's compare two situations: one object is near and the other is far away:
 In conclusion, provided the viewer does not look directly at the image but beyond it, if we repeat some pattern on the image, the brain will interpret it as the pattern actually being behind the screen. Moreover, by changing the frequency of the repetitions, we can create an impression of relative depth: a pattern with close repetitions will appear closer than a pattern with distanced repetitions. This explains why on the image below, the daisies appear further away than the butterflies.
 
 <div style="text-align:center">
-    <img alt="Depth perception and repetition frequency" src="src/readme/medium.png"/>
+    <img alt="Depth perception and repetition frequency" src="src/readme/tutorial_medium.png"/>
     <p>
         <i>When looking beyond this image, the daisies appear further away than the butterflies because of the difference in repetition frequency.</i>
     </p>
 </div>
 
-Another interesting property is that only one repetition is needed to perceive depth. This means that on a same row, we can vary the perceived depth by changing the frequency, creating a slope effect.
+Another interesting property is that only one repetition is needed to perceive depth. This means that on a same row, we can vary the perceived depth by changing the frequency of the repetitions, creating a slope effect.
 
 <div style="text-align:center">
     <img alt="We can change depth on a single row" src="src/readme/frequency-change.png"/>
@@ -96,7 +96,7 @@ Another interesting property is that only one repetition is needed to perceive d
 ### Algorithm
 We want to generate an autostereogram given the following inputs:
 - a depth map encoded as a black and white image, in this example a sphere;
-- a base pattern, in this example a clouds texture.
+- a base pattern, in this example a seamless clouds texture.
 
 Since this is all about repetition, let's define our base repetition period in pixels. Then let's split our target image into vertical stripes, each having the repetition period as width.
 
