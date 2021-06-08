@@ -12,7 +12,9 @@ const data = {
         "In this project, you can use your own depth map, customize the tiles as well as the way the image is computed. It all runs on GPU and can also handle live moving scenes in real time."
     ],
     githubProjectName: "stereogram-webgl",
-    additionalLinks: [],
+    additionalLinks: [
+        { href: "https://piellardj.github.io/stereogram-solver/", text: "See my Magic Eye solver here." },
+    ],
     styleFiles: [],
     scriptFiles: [
         "script/gl-matrix-2.5.1-min.js",
