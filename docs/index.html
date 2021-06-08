@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="description" content="Stereogram (aka Magic Eye) online generator running on GPU with WebGL." />
+    <title>Stereogram</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="icon" type="image/png" href="favicon-16x16.png" sizes="16x16">
+    <link rel="icon" type="image/png" href="favicon-32x32.png" sizes="32x32">
+    <link rel="icon" type="image/png" href="favicon-96x96.png" sizes="96x96">
+    <link rel="stylesheet" type="text/css" href="css/page.css?v=2021-06-08T21%3A33%3A34.566Z">
+  </head>
+
+  <body>
+    <header>
+      <a class="logo logo-animate-fill" href="https://piellardj.github.io" id="back-to-home-button" title="Home" aria-label="Home">
+        <svg class="logo-icon" xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+          <g stroke-width="2">
+            <path fill="none" stroke-linejoin="round" d="M17.5,32h4.5v11h7v-7l1,-1h4l1,1v7h7v-11h4.5L32,16.5z" />
+        </svg>
+      </a>
+    </header>
+    <main>
+      <div class="intro">
+        <h1>Stereogram</h1>
+
+        <div class="description">
+          <p>An autostereogram (also known as Magic Eye) is a 2D image designed to create the illusion of 3D. In each image, there is a 3D object that can only be viewed by looking at the image a certain way, as if the screen was transparent and you looked at the wall behind it. It gets easier with practice.</p>
+          <p>Autostereograms were very popular in the '90s. They take advantage of stereopsis: the brain tries to reconstruct depth by combining the two slightly different images perceived by each eye.</p>
+          <p>In this project, you can use your own depth map, customize the tiles as well as the way the image is computed. It all runs on GPU and can also handle live moving scenes in real time.</p>
+
+          <br>
+
+          <a href="https://github.com/piellardj/stereogram-webgl">More on GitHub</a> <br />
+          <br />
+          <a href="https://piellardj.github.io/stereogram-solver/">See my Magic Eye solver here.</a>
+        </div>
+      </div>
+      <div id="error-messages">
+        <noscript>
+          You need to enable Javascript to run this experiment.
+        </noscript>
+      </div>
+
+      <input type="checkbox" id="fullscreen-checkbox-id" class="hidden">
+      <div class="demo">
+        <input type="checkbox" id="side-pane-checkbox-id" class="hidden">
+        <div id="canvas-container">
+          <canvas id="canvas"></canvas>
+          <div class="loader">
+            <span></span>
+            <div class="loader-animation"></div>
+          </div>
+          <div id="indicators">
+            <div id="fps-indicator-indicator-id">
+              FPS: <span></span>
+            </div>
+            <div id="stripes-count-indicator-indicator-id">
+              Stripes count: <span></span>
+            </div>
+            <div id="tilesize-indicator-indicator-id">
+              Tile size: <span></span>
+            </div>
+          </div>
+          <div id="canvas-buttons-column">
+            <label class="canvas-button" id="fullscreen-toggle-id" for="fullscreen-checkbox-id"></label>
+            <label class="canvas-button" id="side-pane-toggle-id" for="side-pane-checkbox-id"></label>
+          </div>
+        </div>
+        <div class="controls-block">
+          <label class="canvas-button" id="side-pane-close-toggle-id" for="side-pane-checkbox-id">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+              <line x1="22" y1="22" x2="10" y2="10" stroke-linecap="round" stroke-width="2" />
+              <line x1="22" y1="10" x2="10" y2="22" stroke-linecap="round" stroke-width="2" />
+            </svg>
+          </label>
+          <section class="controls-section">
+            <h2>Depth map</h2>
+
+            <div class="controls-list">
+              <div class="control" id="control-show-heightmap-checkbox-id">
+                <label>Show greyscale:</label>
+                <div class="checkbox">
+                  <input type="checkbox" id="show-heightmap-checkbox-id">
+                  <label for="show-heightmap-checkbox-id" class="checkmark"></label>
+                </div>
+              </div>
+              <div class="control" id="control-depth-range-id">
+                <label>Depth:</label>
+                <div class="range-container">
+                  <input type="range" min="0" max="1" value="0.75" step="0.01" class="slider" id="depth-range-id">
+                  <div class="range-skin-container">
+                    <div class="range-stub">
+                      <span class="range-bar range-bar-left range-stub-left"></span>
+                    </div>
+                    <div class="range-progress">
+                      <div class="range-progress-left">
+                        <span class="range-bar range-bar-left"></span>
+                        <span class="range-handle"></span>
+                        <output for="depth-range-id" class="range-tooltip"></output>
+                      </div>
+                      <div class="range-progress-right">
+                        <span class="range-bar range-bar-right"></span>
+                      </div>
+                    </div>
+                    <div class="range-stub">
+                      <span class="range-bar range-bar-right range-stub-right"></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="control" id="control-invert-heightmap-checkbox-id">
+                <label>Invert:</label>
+                <div class="checkbox">
+                  <input type="checkbox" id="invert-heightmap-checkbox-id">
+                  <label for="invert-heightmap-checkbox-id" class="checkmark"></label>
+                </div>
+              </div>
+              <div class="control" id="control-heightmap-mode-tabs-id">
+                <label>Mode:</label>
+                <div class="tabs compact" id="heightmap-mode-tabs-id-id">
+                  <input type="radio" name="heightmap-mode-tabs-id" value="still" id="heightmap-mode-tabs-id-still-id" checked />
+                  <label for="heightmap-mode-tabs-id-still-id">Still</label>
+                  <input type="radio" name="heightmap-mode-tabs-id" value="moving" id="heightmap-mode-tabs-id-moving-id" />
+                  <label for="heightmap-mode-tabs-id-moving-id">Moving</label>
+                </div>
+              </div>
+              <div class="control" id="control-heightmap-preset-select-id">
+                <label>Preset:</label>
+                <div class="select-container compact" id="heightmap-preset-select-id">
+                  <div class="select-current-value" data-value="planet.png">Planet</div>
+                  <div class="select-values-list" data-placeholder="Custom">
+                    <div class="select-value" data-value="planet.png">Planet</div>
+                    <div class="select-value" data-value="bumps.png">Bumps</div>
+                    <div class="select-value" data-value="smile.png">Smile</div>
+                    <div class="select-value" data-value="hand.png">Hand</div>
+                    <div class="select-value" data-value="ripple.png">Ripple</div>
+                    <div class="select-value" data-value="head.png">Head</div>
+                    <div class="select-value" data-value="atomium.png">Atomium</div>
+                    <div class="select-value" data-value="car.png">Car</div>
+                    <div class="select-value" data-value="dolphin.png">Dolphin</div>
+                    <div class="select-value" data-value="tree.png">Tree</div>
+                    <div class="select-value" data-value="ship.png">Ship</div>
+                  </div>
+                </div>
+              </div>
+              <div class="control" id="control-model-preset-select-id">
+                <label>Preset:</label>
+                <div class="select-container compact" id="model-preset-select-id">
+                  <div class="select-current-value" data-value="primitives">Primitives</div>
+                  <div class="select-values-list" data-placeholder="Custom">
+                    <div class="select-value" data-value="primitives">Primitives</div>
+                    <div class="select-value" data-value="cube">Cube</div>
+                    <div class="select-value" data-value="monkey">Monkey</div>
+                    <div class="select-value" data-value="bunny">Bunny</div>
+                    <div class="select-value" data-value="atomium">Atomium</div>
+                  </div>
+                </div>
+              </div>
+              <div class="control" id="control-input-heightmap-upload-button">
+                <label>Custom:</label>
+                <div class="file-control upload compact">
+                  <input type="file" name="file" id="input-heightmap-upload-button" class="file-input" accept=".png,.jpg,.bmp,.webp" />
+                  <label class="file-control-button" for="input-heightmap-upload-button">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+                      <path d="M12 22L12 13 7 13 16 2 25 13 20 13 20 22ZM6 25L26 25 26 29 6 29Z" />
+                    </svg>
+                    <span data-placeholder="Upload a depth map">Upload a depth map</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </section>
+          <hr />
+          <section class="controls-section">
+            <h2>Tile</h2>
+
+            <div class="controls-list">
+              <div class="control" id="control-tile-mode-tabs-id">
+                <label>Mode:</label>
+                <div class="tabs compact" id="tile-mode-tabs-id-id">
+                  <input type="radio" name="tile-mode-tabs-id" value="texture" id="tile-mode-tabs-id-texture-id" checked />
+                  <label for="tile-mode-tabs-id-texture-id">Texture</label>
+                  <input type="radio" name="tile-mode-tabs-id" value="noise" id="tile-mode-tabs-id-noise-id" />
+                  <label for="tile-mode-tabs-id-noise-id">Noise</label>
+                </div>
+              </div>
+              <div class="control" id="control-tile-preset-select-id">
+                <label>Preset:</label>
+                <div class="select-container compact" id="tile-preset-select-id">
+                  <div class="select-current-value" data-value="space.png">Space</div>
+                  <div class="select-values-list" data-placeholder="Custom">
+                    <div class="select-value" data-value="wallpaper.png">Wallpaper</div>
+                    <div class="select-value" data-value="space.png">Space</div>
+                    <div class="select-value" data-value="foliage.png">Foliage</div>
+                    <div class="select-value" data-value="giraffe.png">Giraffe</div>
+                    <div class="select-value" data-value="stones.png">Stones</div>
+                    <div class="select-value" data-value="leaves.png">Leaves</div>
+                  </div>
+                </div>
+              </div>
+              <div class="control" id="control-tile-noise-resolution-range-id">
+                <label>Resolution:</label>
+                <div class="range-container">
+                  <input type="range" min="8" max="64" value="16" step="1" class="slider" id="tile-noise-resolution-range-id">
+                  <div class="range-skin-container">
+                    <div class="range-stub">
+                      <span class="range-bar range-bar-left range-stub-left"></span>
+                    </div>
+                    <div class="range-progress">
+                      <div class="range-progress-left">
+                        <span class="range-bar range-bar-left"></span>
+                        <span class="range-handle"></span>
+                        <output for="tile-noise-resolution-range-id" class="range-tooltip"></output>
+                      </div>
+                      <div class="range-progress-right">
+                        <span class="range-bar range-bar-right"></span>
+                      </div>
+                    </div>
+                    <div class="range-stub">
+                      <span class="range-bar range-bar-right range-stub-right"></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="control" id="control-tile-noise-square-checkbox-id">
+                <label>Square:</label>
+                <div class="checkbox">
+                  <input type="checkbox" id="tile-noise-square-checkbox-id" checked>
+                  <label for="tile-noise-square-checkbox-id" class="checkmark"></label>
+                </div>
+              </div>
+              <div class="control" id="control-tile-noise-colored-checkbox-id">
+                <label>Colored:</label>
+                <div class="checkbox">
+                  <input type="checkbox" id="tile-noise-colored-checkbox-id" checked>
+                  <label for="tile-noise-colored-checkbox-id" class="checkmark"></label>
+                </div>
+              </div>
+              <div class="control" id="control-input-tile-upload-button">
+                <label>Custom:</label>
+                <div class="file-control upload compact">
+                  <input type="file" name="file" id="input-tile-upload-button" class="file-input" accept=".png,.jpg,.bmp,.webp" />
+                  <label class="file-control-button" for="input-tile-upload-button">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+                      <path d="M12 22L12 13 7 13 16 2 25 13 20 13 20 22ZM6 25L26 25 26 29 6 29Z" />
+                    </svg>
+                    <span data-placeholder="Upload a pattern">Upload a pattern</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </section>
+          <hr />
+          <section class="controls-section">
+            <h2>Stripes</h2>
+
+            <div class="controls-list">
+              <div class="control" id="control-show-uv-checkbox-id">
+                <label>Show UV:</label>
+                <div class="checkbox">
+                  <input type="checkbox" id="show-uv-checkbox-id">
+                  <label for="show-uv-checkbox-id" class="checkmark"></label>
+                </div>
+              </div>
+              <div class="control" id="control-stripes-mode-tabs-id">
+                <label>Mode:</label>
+                <div class="tabs compact" id="stripes-mode-tabs-id-id">
+                  <input type="radio" name="stripes-mode-tabs-id" value="adaptative" id="stripes-mode-tabs-id-adaptative-id" checked />
+                  <label for="stripes-mode-tabs-id-adaptative-id">Adaptative</label>
+                  <input type="radio" name="stripes-mode-tabs-id" value="fixed" id="stripes-mode-tabs-id-fixed-id" />
+                  <label for="stripes-mode-tabs-id-fixed-id">Fixed</label>
+                </div>
+              </div>
+              <div class="control" id="control-stripes-width-range-id">
+                <label>Stripes width:</label>
+                <div class="range-container">
+                  <input type="range" min="20" max="200" value="80" step="1" class="slider" id="stripes-width-range-id">
+                  <div class="range-skin-container">
+                    <div class="range-stub">
+                      <span class="range-bar range-bar-left range-stub-left"></span>
+                    </div>
+                    <div class="range-progress">
+                      <div class="range-progress-left">
+                        <span class="range-bar range-bar-left"></span>
+                        <span class="range-handle"></span>
+                        <output for="stripes-width-range-id" class="range-tooltip"></output>
+                      </div>
+                      <div class="range-progress-right">
+                        <span class="range-bar range-bar-right"></span>
+                      </div>
+                    </div>
+                    <div class="range-stub">
+                      <span class="range-bar range-bar-right range-stub-right"></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="control" id="control-stripes-count-range-id">
+                <label>Stripes count:</label>
+                <div class="range-container">
+                  <input type="range" min="8" max="24" value="16" step="1" class="slider" id="stripes-count-range-id">
+                  <div class="range-skin-container">
+                    <div class="range-stub">
+                      <span class="range-bar range-bar-left range-stub-left"></span>
+                    </div>
+                    <div class="range-progress">
+                      <div class="range-progress-left">
+                        <span class="range-bar range-bar-left"></span>
+                        <span class="range-handle"></span>
+                        <output for="stripes-count-range-id" class="range-tooltip"></output>
+                      </div>
+                      <div class="range-progress-right">
+                        <span class="range-bar range-bar-right"></span>
+                      </div>
+                    </div>
+                    <div class="range-stub">
+                      <span class="range-bar range-bar-right range-stub-right"></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+          <hr />
+          <section class="controls-section">
+            <h2>Output</h2>
+
+            <div class="controls-list">
+              <div class="control" id="control-show-indicators-checkbox-id">
+                <label>Show indicators:</label>
+                <div class="checkbox">
+                  <input type="checkbox" id="show-indicators-checkbox-id">
+                  <label for="show-indicators-checkbox-id" class="checkmark"></label>
+                </div>
+              </div>
+              <div class="control" id="control-image-download-id">
+                <div class="file-control download ">
+                  <input type="button" id="image-download-id" class="file-input" />
+                  <label class="file-control-button" for="image-download-id">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+                      <path d="M12 4L12 13 7 13 16 24 25 13 20 13 20 4ZM6 25L26 25 26 29 6 29Z" />
+                    </svg>
+                    <span>Download image</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <div class="badge-shelf">
+        <a class="badge" href="mailto:jeremie.piellard@gmail.com" title="Email">
+          <svg xmlns="http://www.w3.org/2000/svg" width="32px" height="32px" viewBox="0 0 512 512">
+            <path d="M512 85V448H0V85l256 224L512 85zM488 64H24L256 267 488 64z" />
+          </svg>
+        </a>
+
+        <a class="badge" href="https://github.com/piellardj" title="GitHub">
+          <svg xmlns="http://www.w3.org/2000/svg" width="32px" height="32px" viewBox="0 0 1024 1024">
+            <path d="M512 0C229 0 0 229 0 512c0 226 147 418 350 486 26 5 35-11 35-25 0-12 0-53-1-95C242 909 212 818 212 818c-23-59-57-75-57-75-47-32 4-31 4-31 51 4 78 53 78 53 46 78 120 56 149 43 5-33 18-56 33-68C305 725 185 682 185 485c0-56 20-102 53-137-5-13-23-65 5-136 0 0 43-14 141 53 41-11 85-17 128-17 44 0 87 6 128 17 98-66 141-52 141-52 28 71 10 123 5 136 33 36 53 81 53 137 0 197-120 240-234 253 18 16 35 47 35 95 0 68-1 124-1 141 0 14 9 30 35 25C877 930 1024 738 1024 512 1024 229 795 0 512 0z" />
+          </svg>
+        </a>
+
+        <a class="badge" href="https://www.linkedin.com/in/jeremie-piellard/" title="LinkedIn">
+          <svg xmlns="http://www.w3.org/2000/svg" width="32px" height="32px" viewBox="0 0 512 512">
+            <path d="M30 177l93-1v304l-93 1v-304z" />
+            <path d="M200 177l89-1v39l0 11c26-26 53-45 97-45 51 0 100 21 100 91v208l-90 1v-159c0-35-9-58-51-58-37 0-52 7-52 55v160l-92 1v-304z" />
+            <path d="M128 81c0 28-23 51-51 51s-51-23-51-51c0-28 23-51 51-51 28 0 51 23 51 51z" />
+          </svg>
+        </a>
+      </div>
+    </footer>
+    <script type="text/javascript">
+      var Page = Page || {};
+      Page.version = "2021-06-08T21%3A33%3A34.566Z";
+    </script>
+    <script src="script/page.min.js?v=2021-06-08T21%3A33%3A34.566Z"></script>
+    <script src="script/gl-matrix-2.5.1-min.js?v=2021-06-08T21%3A33%3A34.566Z"></script>
+    <script src="script/main.min.js?v=2021-06-08T21%3A33%3A34.566Z"></script>
+  </body>
+
+</html>
