@@ -1,12 +1,12 @@
-import { Engine } from "./engine";
 import * as GLCanvas from "./gl-utils/gl-canvas";
 import { gl } from "./gl-utils/gl-canvas";
+
+import { Engine } from "./engine";
 import { Heightmap } from "./heightmap";
-import "./page-interface-generated";
 import { EHeightmapMode, ETileMode, Parameters } from "./parameters";
 import { Tile } from "./tile";
 
-
+import "./page-interface-generated";
 
 
 function main(): void {
