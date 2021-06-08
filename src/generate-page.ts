@@ -55,7 +55,7 @@ const data = {
                     id: "depth-range-id",
                     min: 0,
                     max: 1,
-                    value: 0.75,
+                    value: 1,
                     step: 0.01
                 },
                 {
