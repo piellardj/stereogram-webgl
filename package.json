@@ -1,6 +1,6 @@
 {
   "name": "stereogram-webgl",
-  "homepage": "https://piellardj.github.io/stereogram",
+  "homepage": "https://piellardj.github.io/stereogram-webgl",
   "scripts": {
     "pre-commit": "npm run rebuild && npm run lint",
     "http-server": "http-server ./docs -p 8080",
