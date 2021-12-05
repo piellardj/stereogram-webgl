@@ -87,7 +87,7 @@ function download(canvas: HTMLCanvasElement): void {
 
     if ((canvas as any).msToBlob) { // for IE
         const blob = (canvas as any).msToBlob();
-        window.navigator.msSaveBlob(blob, name);
+        (window.navigator as any).msSaveBlob(blob, name);
     } else {
         canvas.toBlob((blob: Blob) => {
             const link = document.createElement("a");
