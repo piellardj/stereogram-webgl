@@ -1,4 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 var Page;
 (function (Page) {
     var Demopage;
@@ -44,7 +43,6 @@ var Page;
     })(Demopage = Page.Demopage || (Page.Demopage = {}));
 })(Page || (Page = {}));
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 var Page;
 (function (Page) {
     var Helpers;
@@ -163,7 +161,6 @@ var Page;
     })(Helpers = Page.Helpers || (Page.Helpers = {}));
 })(Page || (Page = {}));
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 var Page;
 (function (Page) {
     var Controls;
@@ -184,7 +181,6 @@ var Page;
         Controls.setVisibility = setVisibility;
     })(Controls = Page.Controls || (Page.Controls = {}));
 })(Page || (Page = {}));
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 (function (Page) {
     var Sections;
     (function (Sections) {
@@ -245,7 +241,6 @@ var Page;
 })(Page || (Page = {}));
 
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 var Page;
 (function (Page) {
     var Checkbox;
@@ -384,7 +379,6 @@ var Page;
 })(Page || (Page = {}));
 
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 var Page;
 (function (Page) {
     var Range;
@@ -398,7 +392,10 @@ var Page;
                 this.progressLeftElement = container.querySelector(".range-progress-left");
                 this.tooltipElement = container.querySelector("output.range-tooltip");
                 this.id = this.inputElement.id;
-                this.nbDecimalsToDisplay = Range.getMaxNbDecimals(+this.inputElement.min, +this.inputElement.max, +this.inputElement.step);
+                var inputMin = +this.inputElement.min;
+                var inputMax = +this.inputElement.max;
+                var inputStep = +this.inputElement.step;
+                this.nbDecimalsToDisplay = Range.getMaxNbDecimals(inputMin, inputMax, inputStep);
                 this.inputElement.addEventListener("input", function (event) {
                     event.stopPropagation();
                     _this.reloadValue();
@@ -539,7 +536,8 @@ var Page;
             Cache.load();
             Storage.applyStoredState();
         });
-        var isIE11 = !!window.MSInputMethodContext && !!document["documentMode"];
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        var isIE11 = !!window.MSInputMethodContext && !!document.documentMode;
         /**
          * Callback will be called every time the value changes.
          * @return {boolean} Whether or not the observer was added
@@ -600,7 +598,6 @@ var Page;
 })(Page || (Page = {}));
 
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 var Page;
 (function (Page) {
     var Tabs;
@@ -768,7 +765,6 @@ var Page;
 })(Page || (Page = {}));
 
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 var Page;
 (function (Page) {
     var Select;
@@ -781,14 +777,14 @@ var Page;
                 this.containerElement = container;
                 this.currentValueElement = container.querySelector(".select-current-value");
                 this.valuesListElement = container.querySelector(".select-values-list");
-                this.placeholder = this.valuesListElement.dataset.placeholder;
-                this.currentValue = this.currentValueElement.dataset.value;
+                this.placeholder = this.valuesListElement.dataset["placeholder"];
+                this.currentValue = this.currentValueElement.dataset["value"];
                 this.valueElements = [];
                 var elements = this.valuesListElement.querySelectorAll(".select-value[data-value]");
                 for (var i = 0; i < elements.length; i++) {
                     this.valueElements.push(elements[i]);
                 }
-                this.containerElement.style.width = this.computeMinimumWidth() + "px";
+                this.containerElement.style.width = "".concat(this.computeMinimumWidth(), "px");
                 document.addEventListener("click", function (event) {
                     var clickedElement = event.target;
                     var isExpanded = _this.containerElement.classList.contains(Select.EXPANDED_CLASS);
@@ -798,8 +794,8 @@ var Page;
                             for (var _i = 0, _a = _this.valueElements; _i < _a.length; _i++) {
                                 var valueElement = _a[_i];
                                 if (valueElement.contains(clickedElement)) {
-                                    _this.currentValue = valueElement.dataset.value;
-                                    _this.currentValueElement.dataset.value = _this.currentValue;
+                                    _this.currentValue = valueElement.dataset["value"];
+                                    _this.currentValueElement.dataset["value"] = _this.currentValue;
                                     _this.currentValueElement.textContent = valueElement.textContent;
                                     Storage.storeState(_this);
                                     _this.callObservers();
@@ -829,14 +825,15 @@ var Page;
                     else {
                         for (var _i = 0, _a = this.valueElements; _i < _a.length; _i++) {
                             var valueElement = _a[_i];
-                            if (valueElement.dataset.value === v) {
-                                this.currentValue = valueElement.dataset.value;
-                                this.currentValueElement.dataset.value = valueElement.dataset.value;
+                            var valueFromHtml = valueElement.dataset["value"];
+                            if (valueFromHtml === v) {
+                                this.currentValue = valueFromHtml;
+                                this.currentValueElement.dataset["value"] = valueFromHtml;
                                 this.currentValueElement.textContent = valueElement.textContent;
                                 return;
                             }
                         }
-                        console.log("No \"" + v + "\" value for \"" + this.id + "\" select.");
+                        console.log("No \"".concat(v, "\" value for \"").concat(this.id, "\" select."));
                     }
                 },
                 enumerable: false,
@@ -958,7 +955,6 @@ var Page;
     })(Select = Page.Select || (Page.Select = {}));
 })(Page || (Page = {}));
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 var Page;
 (function (Page) {
     var FileControl;
@@ -983,7 +979,7 @@ var Page;
             }
             FileUpload.prototype.clear = function () {
                 this.inputElement.value = "";
-                this.labelSpanElement.innerText = this.labelSpanElement.dataset.placeholder;
+                this.labelSpanElement.innerText = this.labelSpanElement.dataset["placeholder"];
             };
             FileUpload.truncate = function (name) {
                 if (name.length > FileUpload.filenameMaxSize) {
@@ -1091,12 +1087,8 @@ var Page;
     })(FileControl = Page.FileControl || (Page.FileControl = {}));
 })(Page || (Page = {}));
 
-var Page;
-(function (Page) {
-})(Page || (Page = {}));
 
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 var Page;
 (function (Page) {
     var Canvas;
@@ -1213,11 +1205,11 @@ var Page;
         }
         var Mouse;
         (function (Mouse) {
-            var mousePosition = [];
+            var mousePosition = [0, 0];
             var clientMousePosition = [0, 0];
             var isMouseDownInternal = false;
             function getMousePosition() {
-                return mousePosition.slice();
+                return [mousePosition[0], mousePosition[1]];
             }
             Mouse.getMousePosition = getMousePosition;
             function setMousePosition(x, y) {
@@ -1314,9 +1306,7 @@ var Page;
                 });
             }
         })(Mouse || (Mouse = {}));
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        var Touch;
-        (function (Touch) {
+        (function Touch() {
             var currentTouches = [];
             var currentDistance = 0; // for pinching management
             function computeDistance(firstTouch, secondTouch) {
@@ -1409,7 +1399,7 @@ var Page;
                 window.addEventListener("touchend", handleTouchEnd);
                 window.addEventListener("touchmove", handleTouchMove, { passive: false });
             }
-        })(Touch || (Touch = {}));
+        })();
         var Indicators;
         (function (Indicators) {
             var indicatorSpansCache = {};
