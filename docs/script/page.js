@@ -5,10 +5,13 @@ var Page;
         var errorsBlockId = "error-messages";
         var errorsBlock = document.getElementById(errorsBlockId);
         if (!errorsBlock) {
-            console.error("Cannot find element '" + errorsBlockId + "'.");
+            throw new Error("Cannot find element '" + errorsBlockId + "'.");
         }
         function getErrorById(id) {
-            return errorsBlock.querySelector("span[id=error-message-" + id + "]");
+            if (errorsBlock) {
+                return errorsBlock.querySelector("span[id=error-message-" + id + "]");
+            }
+            return null;
         }
         function setErrorMessage(id, message) {
             if (errorsBlock) {
@@ -47,6 +50,49 @@ var Page;
 (function (Page) {
     var Helpers;
     (function (Helpers) {
+        var Utils;
+        (function (Utils) {
+            function selectorAll(base, selector) {
+                var elements = base.querySelectorAll(selector);
+                var result = [];
+                for (var i = 0; i < elements.length; i++) {
+                    result.push(elements[i]);
+                }
+                return result;
+            }
+            Utils.selectorAll = selectorAll;
+            /** @throws if no element was found */
+            function selector(base, selector) {
+                var element = base.querySelector(selector);
+                if (!element) {
+                    throw new Error("No element matching '".concat(selector, "'."));
+                }
+                return element;
+            }
+            Utils.selector = selector;
+            function touchArray(touchList) {
+                var result = [];
+                for (var i = 0; i < touchList.length; i++) {
+                    result.push(touchList[i]);
+                }
+                return result;
+            }
+            Utils.touchArray = touchArray;
+            function findFirst(array, predicate) {
+                if (typeof Array.prototype.findIndex === "function") {
+                    return array.findIndex(predicate);
+                }
+                else {
+                    for (var i = 0; i < array.length; i++) {
+                        if (predicate(array[i])) {
+                            return i;
+                        }
+                    }
+                    return -1;
+                }
+            }
+            Utils.findFirst = findFirst;
+        })(Utils = Helpers.Utils || (Helpers.Utils = {}));
         var URL;
         (function (URL) {
             var PARAMETERS_PREFIX = "page";
@@ -158,8 +204,82 @@ var Page;
             }
             Events.callAfterDOMLoaded = callAfterDOMLoaded;
         })(Events = Helpers.Events || (Helpers.Events = {}));
+        var Cache = /** @class */ (function () {
+            function Cache(objectsName, loadObjectsFunction) {
+                this.objectsName = objectsName;
+                this.loadObjectsFunction = loadObjectsFunction;
+                this.cacheObject = null;
+            }
+            /** @throws An Error if the ID is unknown */
+            Cache.prototype.getById = function (id) {
+                var object = this.safeCacheObject[id];
+                if (!object) {
+                    throw new Error("Invalid '".concat(this.objectsName, "' cache object id '").concat(id, "'."));
+                }
+                return object;
+            };
+            /** @returns null if the ID is unknown */
+            Cache.prototype.getByIdSafe = function (id) {
+                return this.safeCacheObject[id] || null;
+            };
+            Cache.prototype.load = function () {
+                if (!this.cacheObject) {
+                    this.cacheObject = this.loadCacheObject();
+                }
+            };
+            Object.defineProperty(Cache.prototype, "safeCacheObject", {
+                get: function () {
+                    if (!this.cacheObject) {
+                        this.load();
+                    }
+                    return this.cacheObject;
+                },
+                enumerable: false,
+                configurable: true
+            });
+            Cache.prototype.loadCacheObject = function () {
+                var index = {};
+                var objects = this.loadObjectsFunction();
+                for (var _i = 0, objects_1 = objects; _i < objects_1.length; _i++) {
+                    var object = objects_1[_i];
+                    if (typeof index[object.id] !== "undefined") {
+                        throw new Error("Object '".concat(object.id, "' is already in cache."));
+                    }
+                    index[object.id] = object;
+                }
+                return index;
+            };
+            return Cache;
+        }());
+        Helpers.Cache = Cache;
+        var Storage = /** @class */ (function () {
+            function Storage(prefix, serialize, tryDeserialize) {
+                this.prefix = prefix;
+                this.serialize = serialize;
+                this.tryDeserialize = tryDeserialize;
+            }
+            Storage.prototype.storeState = function (control) {
+                var valueAsString = this.serialize(control);
+                Page.Helpers.URL.setQueryParameter(this.prefix, control.id, valueAsString);
+            };
+            Storage.prototype.clearStoredState = function (control) {
+                Page.Helpers.URL.removeQueryParameter(this.prefix, control.id);
+            };
+            Storage.prototype.applyStoredState = function () {
+                var _this = this;
+                Page.Helpers.URL.loopOnParameters(this.prefix, function (controlId, value) {
+                    if (!_this.tryDeserialize(controlId, value)) {
+                        console.log("Removing invalid query parameter '" + controlId + "=" + value + "'.");
+                        Page.Helpers.URL.removeQueryParameter(_this.prefix, controlId);
+                    }
+                });
+            };
+            return Storage;
+        }());
+        Helpers.Storage = Storage;
     })(Helpers = Page.Helpers || (Page.Helpers = {}));
 })(Page || (Page = {}));
+
 
 var Page;
 (function (Page) {
@@ -198,40 +318,43 @@ var Page;
             function isVisible(element) {
                 return element.style.display !== "none";
             }
-            var sectionsOrHr = controlsBlockElement.querySelectorAll("section, hr");
+            var sectionsOrHr = Page.Helpers.Utils.selectorAll(controlsBlockElement, "section, hr");
             //remove duplicate HRs
             var lastWasHr = false;
-            for (var i = 0; i < sectionsOrHr.length; i++) {
-                if (isHr(sectionsOrHr[i])) {
-                    sectionsOrHr[i].style.display = lastWasHr ? "none" : "";
+            for (var _i = 0, sectionsOrHr_1 = sectionsOrHr; _i < sectionsOrHr_1.length; _i++) {
+                var sectionOrHr = sectionsOrHr_1[_i];
+                if (isHr(sectionOrHr)) {
+                    sectionOrHr.style.display = lastWasHr ? "none" : "";
                     lastWasHr = true;
                 }
-                else if (isVisible(sectionsOrHr[i])) {
+                else if (isVisible(sectionOrHr)) {
                     lastWasHr = false;
                 }
             }
             // remove leading HRs
-            for (var i = 0; i < sectionsOrHr.length; i++) {
-                if (isHr(sectionsOrHr[i])) {
-                    sectionsOrHr[i].style.display = "none";
+            for (var _a = 0, sectionsOrHr_2 = sectionsOrHr; _a < sectionsOrHr_2.length; _a++) {
+                var sectionOrHr = sectionsOrHr_2[_a];
+                if (isHr(sectionOrHr)) {
+                    sectionOrHr.style.display = "none";
                 }
-                else if (isVisible(sectionsOrHr[i])) {
+                else if (isVisible(sectionOrHr)) {
                     break;
                 }
             }
             // remove trailing HRs
             for (var i = sectionsOrHr.length - 1; i >= 0; i--) {
-                if (isHr(sectionsOrHr[i])) {
-                    sectionsOrHr[i].style.display = "none";
+                var sectionOrHr = sectionsOrHr[i];
+                if (isHr(sectionOrHr)) {
+                    sectionOrHr.style.display = "none";
                 }
-                else if (isVisible(sectionsOrHr[i])) {
+                else if (isVisible(sectionOrHr)) {
                     break;
                 }
             }
         }
         function setVisibility(id, visible) {
             var section = getElementBySelector("section#section-" + id);
-            if (section) {
+            if (section && section.parentElement) {
                 section.style.display = visible ? "" : "none";
                 reevaluateSeparatorsVisibility(section.parentElement);
             }
@@ -254,7 +377,7 @@ var Page;
                 this.reloadValue();
                 this.element.addEventListener("change", function () {
                     _this.reloadValue();
-                    Storage.storeState(_this);
+                    checkboxesStorage.storeState(_this);
                     _this.callObservers();
                 });
             }
@@ -280,99 +403,51 @@ var Page;
             };
             return Checkbox;
         }());
-        var Cache;
-        (function (Cache) {
-            function loadCache() {
-                var result = {};
-                var selector = "div.checkbox > input[type=checkbox][id]";
-                var elements = document.querySelectorAll(selector);
-                for (var i = 0; i < elements.length; i++) {
-                    var checkbox = new Checkbox(elements[i]);
-                    result[checkbox.id] = checkbox;
-                }
-                return result;
-            }
-            var checkboxesCache;
-            function getCheckboxById(id) {
-                Cache.load();
-                return checkboxesCache[id] || null;
-            }
-            Cache.getCheckboxById = getCheckboxById;
-            function load() {
-                if (typeof checkboxesCache === "undefined") {
-                    checkboxesCache = loadCache();
-                }
-            }
-            Cache.load = load;
-        })(Cache || (Cache = {}));
-        var Storage;
-        (function (Storage) {
-            var PREFIX = "checkbox";
-            var CHECKED = "true";
-            var UNCHECKED = "false";
-            function storeState(checkbox) {
-                var stateAsString = checkbox.checked ? CHECKED : UNCHECKED;
-                Page.Helpers.URL.setQueryParameter(PREFIX, checkbox.id, stateAsString);
-            }
-            Storage.storeState = storeState;
-            function clearStoredState(checkbox) {
-                Page.Helpers.URL.removeQueryParameter(PREFIX, checkbox.id);
-            }
-            Storage.clearStoredState = clearStoredState;
-            function applyStoredState() {
-                Page.Helpers.URL.loopOnParameters(PREFIX, function (checkboxId, value) {
-                    var checkbox = Cache.getCheckboxById(checkboxId);
-                    if (!checkbox || (value !== CHECKED && value !== UNCHECKED)) {
-                        console.log("Removing invalid query parameter '" + checkboxId + "=" + value + "'.");
-                        Page.Helpers.URL.removeQueryParameter(PREFIX, checkboxId);
-                    }
-                    else {
-                        checkbox.checked = (value === CHECKED);
-                        checkbox.callObservers();
-                    }
-                });
-            }
-            Storage.applyStoredState = applyStoredState;
-        })(Storage || (Storage = {}));
-        Page.Helpers.Events.callAfterDOMLoaded(function () {
-            Cache.load();
-            Storage.applyStoredState();
+        var checkboxesCache = new Page.Helpers.Cache("Checkbox", function () {
+            var selector = "div.checkbox > input[type=checkbox][id]";
+            var elements = Page.Helpers.Utils.selectorAll(document, selector);
+            return elements.map(function (element) {
+                return new Checkbox(element);
+            });
         });
-        /**
-         * @return {boolean} Whether or not the observer was added
-         */
-        function addObserver(checkboxId, observer) {
-            var checkbox = Cache.getCheckboxById(checkboxId);
-            if (checkbox) {
-                checkbox.observers.push(observer);
+        var checkboxesStorage = new Page.Helpers.Storage("checkbox", function (checkbox) {
+            return checkbox.checked ? "true" : "false";
+        }, function (id, serializedValue) {
+            var checkbox = checkboxesCache.getByIdSafe(id);
+            if (checkbox && (serializedValue === "true" || serializedValue === "false")) {
+                checkbox.checked = (serializedValue === "true");
+                checkbox.callObservers();
                 return true;
             }
             return false;
+        });
+        Page.Helpers.Events.callAfterDOMLoaded(function () {
+            checkboxesCache.load();
+            checkboxesStorage.applyStoredState();
+        });
+        function addObserver(checkboxId, observer) {
+            var checkbox = checkboxesCache.getById(checkboxId);
+            checkbox.observers.push(observer);
         }
         Checkbox_1.addObserver = addObserver;
         function setChecked(checkboxId, value) {
-            var checkbox = Cache.getCheckboxById(checkboxId);
-            if (checkbox) {
-                checkbox.checked = value;
-            }
+            var checkbox = checkboxesCache.getById(checkboxId);
+            checkbox.checked = value;
         }
         Checkbox_1.setChecked = setChecked;
         function isChecked(checkboxId) {
-            var checkbox = Cache.getCheckboxById(checkboxId);
-            if (checkbox) {
-                return checkbox.checked;
-            }
-            return false;
+            var checkbox = checkboxesCache.getById(checkboxId);
+            return checkbox.checked;
         }
         Checkbox_1.isChecked = isChecked;
         function storeState(checkboxId) {
-            var checkbox = Cache.getCheckboxById(checkboxId);
-            Storage.storeState(checkbox);
+            var checkbox = checkboxesCache.getById(checkboxId);
+            checkboxesStorage.storeState(checkbox);
         }
         Checkbox_1.storeState = storeState;
         function clearStoredState(checkboxId) {
-            var checkbox = Cache.getCheckboxById(checkboxId);
-            Storage.clearStoredState(checkbox);
+            var checkbox = checkboxesCache.getById(checkboxId);
+            checkboxesStorage.clearStoredState(checkbox);
         }
         Checkbox_1.clearStoredState = clearStoredState;
     })(Checkbox = Page.Checkbox || (Page.Checkbox = {}));
@@ -388,9 +463,9 @@ var Page;
                 var _this = this;
                 this.onInputObservers = [];
                 this.onChangeObservers = [];
-                this.inputElement = container.querySelector("input[type='range']");
-                this.progressLeftElement = container.querySelector(".range-progress-left");
-                this.tooltipElement = container.querySelector("output.range-tooltip");
+                this.inputElement = Page.Helpers.Utils.selector(container, "input[type='range']");
+                this.progressLeftElement = Page.Helpers.Utils.selector(container, ".range-progress-left");
+                this.tooltipElement = Page.Helpers.Utils.selector(container, "output.range-tooltip");
                 this.id = this.inputElement.id;
                 var inputMin = +this.inputElement.min;
                 var inputMax = +this.inputElement.max;
@@ -404,7 +479,7 @@ var Page;
                 this.inputElement.addEventListener("change", function (event) {
                     event.stopPropagation();
                     _this.reloadValue();
-                    Storage.storeState(_this);
+                    rangesStorage.storeState(_this);
                     _this.callSpecificObservers(_this.onChangeObservers);
                 });
                 this.reloadValue();
@@ -479,119 +554,67 @@ var Page;
             };
             return Range;
         }());
-        var Cache;
-        (function (Cache) {
-            function loadCache() {
-                var result = {};
-                var selector = ".range-container > input[type='range']";
-                var rangeElements = document.querySelectorAll(selector);
-                for (var i = 0; i < rangeElements.length; i++) {
-                    var container = rangeElements[i].parentElement;
-                    var id = rangeElements[i].id;
-                    result[id] = new Range(container);
-                }
-                return result;
-            }
-            var rangesCache;
-            function getRangeById(id) {
-                Cache.load();
-                return rangesCache[id] || null;
-            }
-            Cache.getRangeById = getRangeById;
-            function load() {
-                if (typeof rangesCache === "undefined") {
-                    rangesCache = loadCache();
-                }
-            }
-            Cache.load = load;
-        })(Cache || (Cache = {}));
-        var Storage;
-        (function (Storage) {
-            var PREFIX = "range";
-            function storeState(range) {
-                var valueAsString = "" + range.value;
-                Page.Helpers.URL.setQueryParameter(PREFIX, range.id, valueAsString);
-            }
-            Storage.storeState = storeState;
-            function clearStoredState(range) {
-                Page.Helpers.URL.removeQueryParameter(PREFIX, range.id);
-            }
-            Storage.clearStoredState = clearStoredState;
-            function applyStoredState() {
-                Page.Helpers.URL.loopOnParameters(PREFIX, function (controlId, value) {
-                    var range = Cache.getRangeById(controlId);
-                    if (!range) {
-                        console.log("Removing invalid query parameter '" + controlId + "=" + value + "'.");
-                        Page.Helpers.URL.removeQueryParameter(PREFIX, controlId);
-                    }
-                    else {
-                        range.value = +value;
-                        range.callObservers();
-                    }
-                });
-            }
-            Storage.applyStoredState = applyStoredState;
-        })(Storage || (Storage = {}));
-        Page.Helpers.Events.callAfterDOMLoaded(function () {
-            Cache.load();
-            Storage.applyStoredState();
+        var rangesCache = new Page.Helpers.Cache("Range", function () {
+            var selector = ".range-container > input[type='range']";
+            var rangeElements = Page.Helpers.Utils.selectorAll(document, selector);
+            return rangeElements.map(function (rangeElement) {
+                var container = rangeElement.parentElement;
+                return new Range(container);
+            });
         });
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        var isIE11 = !!window.MSInputMethodContext && !!document.documentMode;
-        /**
-         * Callback will be called every time the value changes.
-         * @return {boolean} Whether or not the observer was added
-         */
-        function addObserver(rangeId, observer) {
-            var range = Cache.getRangeById(rangeId);
+        var rangesStorage = new Page.Helpers.Storage("range", function (range) {
+            return "" + range.value;
+        }, function (id, serializedValue) {
+            var range = rangesCache.getByIdSafe(id);
             if (range) {
-                if (isIE11) { // bug in IE 11, input event is never fired
-                    range.onChangeObservers.push(observer);
-                }
-                else {
-                    range.onInputObservers.push(observer);
-                }
+                range.value = +serializedValue;
+                range.callObservers();
                 return true;
             }
             return false;
+        });
+        Page.Helpers.Events.callAfterDOMLoaded(function () {
+            rangesCache.load();
+            rangesStorage.applyStoredState();
+        });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        var isIE11 = !!window.MSInputMethodContext && !!document.documentMode;
+        function addObserver(rangeId, observer) {
+            var range = rangesCache.getById(rangeId);
+            if (isIE11) { // bug in IE 11, input event is never fired
+                range.onChangeObservers.push(observer);
+            }
+            else {
+                range.onInputObservers.push(observer);
+            }
         }
         Range_1.addObserver = addObserver;
         /**
          * Callback will be called only when the value stops changing.
-         * @return {boolean} Whether or not the observer was added
          */
         function addLazyObserver(rangeId, observer) {
-            var range = Cache.getRangeById(rangeId);
-            if (range) {
-                range.onChangeObservers.push(observer);
-                return true;
-            }
-            return false;
+            var range = rangesCache.getById(rangeId);
+            range.onChangeObservers.push(observer);
         }
         Range_1.addLazyObserver = addLazyObserver;
         function getValue(rangeId) {
-            var range = Cache.getRangeById(rangeId);
-            if (!range) {
-                return null;
-            }
+            var range = rangesCache.getById(rangeId);
             return range.value;
         }
         Range_1.getValue = getValue;
         function setValue(rangeId, value) {
-            var range = Cache.getRangeById(rangeId);
-            if (range) {
-                range.value = value;
-            }
+            var range = rangesCache.getById(rangeId);
+            range.value = value;
         }
         Range_1.setValue = setValue;
         function storeState(rangeId) {
-            var range = Cache.getRangeById(rangeId);
-            Storage.storeState(range);
+            var range = rangesCache.getById(rangeId);
+            rangesStorage.storeState(range);
         }
         Range_1.storeState = storeState;
         function clearStoredState(rangeId) {
-            var range = Cache.getRangeById(rangeId);
-            Storage.clearStoredState(range);
+            var range = rangesCache.getById(rangeId);
+            rangesStorage.clearStoredState(range);
         }
         Range_1.clearStoredState = clearStoredState;
     })(Range = Page.Range || (Page.Range = {}));
@@ -608,13 +631,14 @@ var Page;
                 this.observers = [];
                 this.id = Tabs.computeShortId(container.id);
                 this.inputElements = [];
-                var inputElements = container.querySelectorAll("input");
-                for (var i = 0; i < inputElements.length; i++) {
-                    this.inputElements.push(inputElements[i]);
-                    inputElements[i].addEventListener("change", function (event) {
+                var inputElements = Page.Helpers.Utils.selectorAll(container, "input");
+                for (var _i = 0, inputElements_1 = inputElements; _i < inputElements_1.length; _i++) {
+                    var inputElement = inputElements_1[_i];
+                    this.inputElements.push(inputElement);
+                    inputElement.addEventListener("change", function (event) {
                         event.stopPropagation();
                         _this.reloadValues();
-                        Storage.storeState(_this);
+                        tabsStorage.storeState(_this);
                         _this.callObservers();
                     }, false);
                 }
@@ -667,98 +691,56 @@ var Page;
             Tabs.ID_SUFFIX = "-id";
             return Tabs;
         }());
-        var Cache;
-        (function (Cache) {
-            function loadCache() {
-                var result = {};
-                var containerElements = document.querySelectorAll("div.tabs[id]");
-                for (var i = 0; i < containerElements.length; i++) {
-                    var tabs = new Tabs(containerElements[i]);
-                    result[tabs.id] = tabs;
-                }
-                return result;
-            }
-            var tabsCache;
-            function getTabsById(id) {
-                Cache.load();
-                return tabsCache[id] || null;
-            }
-            Cache.getTabsById = getTabsById;
-            function load() {
-                if (typeof tabsCache === "undefined") {
-                    tabsCache = loadCache();
-                }
-            }
-            Cache.load = load;
-        })(Cache || (Cache = {}));
-        var Storage;
-        (function (Storage) {
-            var PREFIX = "tabs";
-            var SEPARATOR = ";";
-            function storeState(tabs) {
-                var valuesList = tabs.values;
-                var values = valuesList.join(SEPARATOR);
-                Page.Helpers.URL.setQueryParameter(PREFIX, tabs.id, values);
-            }
-            Storage.storeState = storeState;
-            function clearStoredState(tabs) {
-                Page.Helpers.URL.removeQueryParameter(PREFIX, tabs.id);
-            }
-            Storage.clearStoredState = clearStoredState;
-            function applyStoredState() {
-                Page.Helpers.URL.loopOnParameters(PREFIX, function (controlId, value) {
-                    var values = value.split(SEPARATOR);
-                    var tabs = Cache.getTabsById(controlId);
-                    if (!tabs) {
-                        console.log("Removing invalid query parameter '" + controlId + "=" + value + "'.");
-                        Page.Helpers.URL.removeQueryParameter(PREFIX, controlId);
-                    }
-                    else {
-                        tabs.values = values;
-                        tabs.callObservers();
-                    }
-                });
-            }
-            Storage.applyStoredState = applyStoredState;
-        })(Storage || (Storage = {}));
-        Page.Helpers.Events.callAfterDOMLoaded(function () {
-            Cache.load();
-            Storage.applyStoredState();
+        var tabsCache = new Page.Helpers.Cache("Tabs", function () {
+            var containerElements = Page.Helpers.Utils.selectorAll(document, "div.tabs[id]");
+            return containerElements.map(function (containerElement) {
+                return new Tabs(containerElement);
+            });
         });
-        /**
-         * @return {boolean} Whether or not the observer was added
-         */
-        function addObserver(tabsId, observer) {
-            var tabs = Cache.getTabsById(tabsId);
+        var tabsStorage = new Page.Helpers.Storage("tabs", function (tabs) {
+            var valuesList = tabs.values;
+            return valuesList.join(";");
+        }, function (id, serializedValue) {
+            var values = serializedValue.split(";");
+            var tabs = tabsCache.getByIdSafe(id);
             if (tabs) {
-                tabs.observers.push(observer);
+                tabs.values = values;
+                tabs.callObservers();
                 return true;
             }
             return false;
+        });
+        Page.Helpers.Events.callAfterDOMLoaded(function () {
+            tabsCache.load();
+            tabsStorage.applyStoredState();
+        });
+        function addObserver(tabsId, observer) {
+            var tabs = tabsCache.getById(tabsId);
+            tabs.observers.push(observer);
         }
         Tabs_1.addObserver = addObserver;
         function getValues(tabsId) {
-            var tabs = Cache.getTabsById(tabsId);
+            var tabs = tabsCache.getById(tabsId);
             return tabs.values;
         }
         Tabs_1.getValues = getValues;
         function setValues(tabsId, values, updateURLStorage) {
             if (updateURLStorage === void 0) { updateURLStorage = false; }
-            var tabs = Cache.getTabsById(tabsId);
+            var tabs = tabsCache.getById(tabsId);
             tabs.values = values;
             if (updateURLStorage) {
-                Storage.storeState(tabs);
+                tabsStorage.storeState(tabs);
             }
         }
         Tabs_1.setValues = setValues;
         function storeState(tabsId) {
-            var tabs = Cache.getTabsById(tabsId);
-            Storage.storeState(tabs);
+            var tabs = tabsCache.getById(tabsId);
+            tabsStorage.storeState(tabs);
         }
         Tabs_1.storeState = storeState;
         function clearStoredState(tabsIdd) {
-            var tabs = Cache.getTabsById(tabsIdd);
-            Storage.clearStoredState(tabs);
+            var tabs = tabsCache.getById(tabsIdd);
+            tabsStorage.clearStoredState(tabs);
         }
         Tabs_1.clearStoredState = clearStoredState;
     })(Tabs = Page.Tabs || (Page.Tabs = {}));
@@ -775,10 +757,10 @@ var Page;
                 this.observers = [];
                 this.id = container.id;
                 this.containerElement = container;
-                this.currentValueElement = container.querySelector(".select-current-value");
-                this.valuesListElement = container.querySelector(".select-values-list");
-                this.placeholder = this.valuesListElement.dataset["placeholder"];
-                this.currentValue = this.currentValueElement.dataset["value"];
+                this.currentValueElement = Page.Helpers.Utils.selector(container, ".select-current-value");
+                this.valuesListElement = Page.Helpers.Utils.selector(container, ".select-values-list");
+                this.placeholder = this.valuesListElement.dataset["placeholder"] || "";
+                this.currentValue = this.currentValueElement.dataset["value"] || null;
                 this.valueElements = [];
                 var elements = this.valuesListElement.querySelectorAll(".select-value[data-value]");
                 for (var i = 0; i < elements.length; i++) {
@@ -794,10 +776,10 @@ var Page;
                             for (var _i = 0, _a = _this.valueElements; _i < _a.length; _i++) {
                                 var valueElement = _a[_i];
                                 if (valueElement.contains(clickedElement)) {
-                                    _this.currentValue = valueElement.dataset["value"];
-                                    _this.currentValueElement.dataset["value"] = _this.currentValue;
+                                    _this.currentValue = valueElement.dataset["value"] || null;
+                                    _this.currentValueElement.dataset["value"] = _this.currentValue || undefined;
                                     _this.currentValueElement.textContent = valueElement.textContent;
-                                    Storage.storeState(_this);
+                                    selectStorage.storeState(_this);
                                     _this.callObservers();
                                 }
                             }
@@ -856,6 +838,9 @@ var Page;
                 placeholderValue.textContent = this.placeholder;
                 this.valuesListElement.appendChild(placeholderValue);
                 var parentNode = this.containerElement.parentNode;
+                if (!parentNode) {
+                    throw new Error("Select in not attached");
+                }
                 var nextSiblingNode = this.containerElement.nextSibling;
                 parentNode.removeChild(this.containerElement);
                 document.body.appendChild(this.containerElement);
@@ -873,83 +858,50 @@ var Page;
             Select.EXPANDED_CLASS = "expanded";
             return Select;
         }());
-        var Cache;
-        (function (Cache) {
-            function loadCache() {
-                var result = {};
-                var containerElements = document.querySelectorAll(".select-container[id]");
-                for (var i = 0; i < containerElements.length; i++) {
-                    var select = new Select(containerElements[i]);
-                    result[select.id] = select;
-                }
-                return result;
+        var selectsCache = new Page.Helpers.Cache("Select", function () {
+            var containerElements = Page.Helpers.Utils.selectorAll(document, ".select-container[id]");
+            return containerElements.map(function (containerElement) {
+                return new Select(containerElement);
+            });
+        });
+        var selectStorage = new Page.Helpers.Storage("select", function (select) {
+            return select.value;
+        }, function (id, serializedValue) {
+            var select = selectsCache.getByIdSafe(id);
+            if (select) {
+                select.value = serializedValue;
+                select.callObservers();
+                return true;
             }
-            var selectsCache;
-            function getSelectById(id) {
-                Cache.load();
-                return selectsCache[id] || null;
-            }
-            Cache.getSelectById = getSelectById;
-            function load() {
-                if (typeof selectsCache === "undefined") {
-                    selectsCache = loadCache();
-                }
-            }
-            Cache.load = load;
-        })(Cache || (Cache = {}));
-        var Storage;
-        (function (Storage) {
-            var PREFIX = "select";
-            function storeState(select) {
-                Page.Helpers.URL.setQueryParameter(PREFIX, select.id, select.value);
-            }
-            Storage.storeState = storeState;
-            function clearStoredState(select) {
-                Page.Helpers.URL.removeQueryParameter(PREFIX, select.id);
-            }
-            Storage.clearStoredState = clearStoredState;
-            function applyStoredState() {
-                Page.Helpers.URL.loopOnParameters(PREFIX, function (controlId, value) {
-                    var select = Cache.getSelectById(controlId);
-                    if (!select) {
-                        console.log("Removing invalid query parameter '" + controlId + "=" + value + "'.");
-                        Page.Helpers.URL.removeQueryParameter(PREFIX, controlId);
-                    }
-                    else {
-                        select.value = value;
-                        select.callObservers();
-                    }
-                });
-            }
-            Storage.applyStoredState = applyStoredState;
-        })(Storage || (Storage = {}));
+            return false;
+        });
         Page.Helpers.Events.callAfterDOMLoaded(function () {
-            Cache.load();
-            Storage.applyStoredState();
+            selectsCache.load();
+            selectStorage.applyStoredState();
         });
         function addObserver(id, observer) {
-            var select = Cache.getSelectById(id);
+            var select = selectsCache.getById(id);
             select.observers.push(observer);
         }
         Select_1.addObserver = addObserver;
         function getValue(id) {
-            var select = Cache.getSelectById(id);
+            var select = selectsCache.getById(id);
             return select.value;
         }
         Select_1.getValue = getValue;
         function setValue(id, value) {
-            var select = Cache.getSelectById(id);
+            var select = selectsCache.getById(id);
             select.value = value;
         }
         Select_1.setValue = setValue;
         function storeState(id) {
-            var select = Cache.getSelectById(id);
-            Storage.storeState(select);
+            var select = selectsCache.getById(id);
+            selectStorage.storeState(select);
         }
         Select_1.storeState = storeState;
         function clearStoredState(id) {
-            var select = Cache.getSelectById(id);
-            Storage.clearStoredState(select);
+            var select = selectsCache.getById(id);
+            selectStorage.clearStoredState(select);
         }
         Select_1.clearStoredState = clearStoredState;
     })(Select = Page.Select || (Page.Select = {}));
@@ -963,12 +915,13 @@ var Page;
             function FileUpload(container) {
                 var _this = this;
                 this.observers = [];
-                this.inputElement = container.querySelector("input");
-                this.labelSpanElement = container.querySelector("label > span");
+                this.inputElement = Page.Helpers.Utils.selector(container, "input");
+                this.labelSpanElement = Page.Helpers.Utils.selector(container, "label > span");
+                this.id = this.inputElement.id;
                 this.inputElement.addEventListener("change", function (event) {
                     event.stopPropagation();
                     var files = _this.inputElement.files;
-                    if (files.length === 1) {
+                    if (files && files.length === 1) {
                         _this.labelSpanElement.innerText = FileUpload.truncate(files[0].name);
                         for (var _i = 0, _a = _this.observers; _i < _a.length; _i++) {
                             var observer = _a[_i];
@@ -979,7 +932,7 @@ var Page;
             }
             FileUpload.prototype.clear = function () {
                 this.inputElement.value = "";
-                this.labelSpanElement.innerText = this.labelSpanElement.dataset["placeholder"];
+                this.labelSpanElement.innerText = this.labelSpanElement.dataset["placeholder"] || "Upload";
             };
             FileUpload.truncate = function (name) {
                 if (name.length > FileUpload.filenameMaxSize) {
@@ -995,7 +948,8 @@ var Page;
             function FileDownload(container) {
                 var _this = this;
                 this.observers = [];
-                this.buttonElement = container.querySelector("input");
+                this.buttonElement = Page.Helpers.Utils.selector(container, "input");
+                this.id = this.buttonElement.id;
                 this.buttonElement.addEventListener("click", function (event) {
                     event.stopPropagation();
                     for (var _i = 0, _a = _this.observers; _i < _a.length; _i++) {
@@ -1006,81 +960,39 @@ var Page;
             }
             return FileDownload;
         }());
-        var Cache;
-        (function (Cache) {
-            function loadFileUploadsCache() {
-                var result = {};
-                var selector = ".file-control.upload > input[id]";
-                var fileUploadInputsElements = document.querySelectorAll(selector);
-                for (var i = 0; i < fileUploadInputsElements.length; i++) {
-                    var container = fileUploadInputsElements[i].parentElement;
-                    var id = fileUploadInputsElements[i].id;
-                    result[id] = new FileUpload(container);
-                }
-                return result;
-            }
-            function loadFileDownloadsCache() {
-                var result = {};
-                var selector = ".file-control.download > input[id]";
-                var fileDownloadInputsElements = document.querySelectorAll(selector);
-                for (var i = 0; i < fileDownloadInputsElements.length; i++) {
-                    var container = fileDownloadInputsElements[i].parentElement;
-                    var id = fileDownloadInputsElements[i].id;
-                    result[id] = new FileDownload(container);
-                }
-                return result;
-            }
-            var fileUploadsCache;
-            var fileDownloadsCache;
-            function getFileUploadById(id) {
-                Cache.load();
-                return fileUploadsCache[id] || null;
-            }
-            Cache.getFileUploadById = getFileUploadById;
-            function getFileDownloadById(id) {
-                Cache.load();
-                return fileDownloadsCache[id] || null;
-            }
-            Cache.getFileDownloadById = getFileDownloadById;
-            function load() {
-                if (typeof fileUploadsCache === "undefined") {
-                    fileUploadsCache = loadFileUploadsCache();
-                }
-                if (typeof fileDownloadsCache === "undefined") {
-                    fileDownloadsCache = loadFileDownloadsCache();
-                }
-            }
-            Cache.load = load;
-        })(Cache || (Cache = {}));
-        Page.Helpers.Events.callAfterDOMLoaded(function () {
-            Cache.load();
+        var fileUploadsCache = new Page.Helpers.Cache("FileUpload", function () {
+            var selector = ".file-control.upload > input[id]";
+            var fileUploadInputsElements = Page.Helpers.Utils.selectorAll(document, selector);
+            return fileUploadInputsElements.map(function (fileUploadInputsElement) {
+                var container = fileUploadInputsElement.parentElement;
+                var fileUpload = new FileUpload(container);
+                return fileUpload;
+            });
         });
-        /**
-         * @return {boolean} Whether or not the observer was added
-         */
+        var fileDownloadsCache = new Page.Helpers.Cache("FileDownload", function () {
+            var selector = ".file-control.download > input[id]";
+            var fileDownloadInputsElements = Page.Helpers.Utils.selectorAll(document, selector);
+            return fileDownloadInputsElements.map(function (fileDownloadInputsElement) {
+                var container = fileDownloadInputsElement.parentElement;
+                return new FileDownload(container);
+            });
+        });
+        Page.Helpers.Events.callAfterDOMLoaded(function () {
+            fileUploadsCache.load();
+            fileUploadsCache.load();
+        });
         function addDownloadObserver(id, observer) {
-            var fileDownload = Cache.getFileDownloadById(id);
-            if (fileDownload) {
-                fileDownload.observers.push(observer);
-                return true;
-            }
-            return false;
+            var fileDownload = fileDownloadsCache.getById(id);
+            fileDownload.observers.push(observer);
         }
         FileControl.addDownloadObserver = addDownloadObserver;
-        /**
-         * @return {boolean} Whether or not the observer was added
-         */
-        function addUploadObserver(uploadId, observer) {
-            var fileUpload = Cache.getFileUploadById(uploadId);
-            if (fileUpload) {
-                fileUpload.observers.push(observer);
-                return true;
-            }
-            return false;
+        function addUploadObserver(id, observer) {
+            var fileUpload = fileUploadsCache.getById(id);
+            fileUpload.observers.push(observer);
         }
         FileControl.addUploadObserver = addUploadObserver;
         function clearFileUpload(id) {
-            var fileUpload = Cache.getFileUploadById(id);
+            var fileUpload = fileUploadsCache.getById(id);
             fileUpload.clear();
         }
         FileControl.clearFileUpload = clearFileUpload;
@@ -1101,17 +1013,17 @@ var Page;
             return elt;
         }
         function getCanvasById(id) {
-            return getElementBySelector("canvas[id=" + id + "]");
+            return Page.Helpers.Utils.selector(document, "canvas[id=" + id + "]");
         }
         function getCheckboxFromId(id) {
-            return getElementBySelector("input[type=checkbox][id=" + id + "]");
+            return Page.Helpers.Utils.selector(document, "input[type=checkbox][id=" + id + "]");
         }
-        var canvasContainer = document.getElementById("canvas-container");
+        var canvasContainer = Page.Helpers.Utils.selector(document, "#canvas-container");
         var canvas = getCanvasById("canvas");
-        var buttonsColumn = document.getElementById("canvas-buttons-column");
+        var buttonsColumn = Page.Helpers.Utils.selector(document, "#canvas-buttons-column");
         var fullscreenCheckbox = getCheckboxFromId("fullscreen-checkbox-id");
         var sidePaneCheckbox = getCheckboxFromId("side-pane-checkbox-id");
-        var loader = canvasContainer.querySelector(".loader");
+        var loader = Page.Helpers.Utils.selector(canvasContainer, ".loader");
         var maxWidth = 512;
         var maxHeight = 512;
         function bindCanvasButtons() {
@@ -1161,8 +1073,7 @@ var Page;
                 canvasContainer.style.maxWidth = inPx(maxWidth);
                 canvasContainer.style.maxHeight = inPx(maxHeight);
             }
-            if (size[0] !== lastCanvasSize[0] ||
-                size[1] !== lastCanvasSize[1]) {
+            if (size[0] !== lastCanvasSize[0] || size[1] !== lastCanvasSize[1]) {
                 lastCanvasSize = getCanvasSize();
                 for (var _i = 0, canvasResizeObservers_1 = canvasResizeObservers; _i < canvasResizeObservers_1.length; _i++) {
                     var observer = canvasResizeObservers_1[_i];
@@ -1316,11 +1227,12 @@ var Page;
             }
             function handleTouchStart(event) {
                 var isFirstTouch = (currentTouches.length === 0);
-                for (var i = 0; i < event.changedTouches.length; ++i) {
-                    var touch = event.changedTouches[i];
+                var changedTouches = Page.Helpers.Utils.touchArray(event.changedTouches);
+                for (var _i = 0, changedTouches_1 = changedTouches; _i < changedTouches_1.length; _i++) {
+                    var touch = changedTouches_1[_i];
                     var alreadyRegistered = false;
-                    for (var _i = 0, currentTouches_1 = currentTouches; _i < currentTouches_1.length; _i++) {
-                        var knownTouch = currentTouches_1[_i];
+                    for (var _a = 0, currentTouches_1 = currentTouches; _a < currentTouches_1.length; _a++) {
+                        var knownTouch = currentTouches_1[_a];
                         if (touch.identifier === knownTouch.id) {
                             alreadyRegistered = true;
                             break;
@@ -1344,8 +1256,9 @@ var Page;
             }
             function handleTouchEnd(event) {
                 var knewAtLeastOneTouch = (currentTouches.length > 0);
-                for (var i = 0; i < event.changedTouches.length; ++i) {
-                    var touch = event.changedTouches[i];
+                var changedTouches = Page.Helpers.Utils.touchArray(event.changedTouches);
+                for (var _i = 0, changedTouches_2 = changedTouches; _i < changedTouches_2.length; _i++) {
+                    var touch = changedTouches_2[_i];
                     for (var iC = 0; iC < currentTouches.length; ++iC) {
                         if (touch.identifier === currentTouches[iC].id) {
                             currentTouches.splice(iC, 1);
@@ -1354,7 +1267,8 @@ var Page;
                     }
                 }
                 if (currentTouches.length === 1) {
-                    var newPos = clientToRelative(currentTouches[0].clientX, currentTouches[0].clientY);
+                    var firstTouch = currentTouches[0];
+                    var newPos = clientToRelative(firstTouch.clientX, firstTouch.clientY);
                     Mouse.setMousePosition(newPos[0], newPos[1]);
                 }
                 else if (knewAtLeastOneTouch && currentTouches.length === 0) {
@@ -1362,11 +1276,11 @@ var Page;
                 }
             }
             function handleTouchMove(event) {
-                var touches = event.changedTouches;
-                for (var i = 0; i < touches.length; ++i) {
-                    var touch = touches[i];
-                    for (var _i = 0, currentTouches_2 = currentTouches; _i < currentTouches_2.length; _i++) {
-                        var knownTouch = currentTouches_2[_i];
+                var touches = Page.Helpers.Utils.touchArray(event.changedTouches);
+                for (var _i = 0, touches_1 = touches; _i < touches_1.length; _i++) {
+                    var touch = touches_1[_i];
+                    for (var _a = 0, currentTouches_2 = currentTouches; _a < currentTouches_2.length; _a++) {
+                        var knownTouch = currentTouches_2[_a];
                         if (touch.identifier === knownTouch.id) {
                             knownTouch.clientX = touch.clientX;
                             knownTouch.clientY = touch.clientY;
@@ -1378,18 +1292,21 @@ var Page;
                     event.preventDefault();
                 }
                 if (currentTouches.length === 1) {
-                    Mouse.mouseMove(currentTouches[0].clientX, currentTouches[0].clientY);
+                    var firstTouch = currentTouches[0];
+                    Mouse.mouseMove(firstTouch.clientX, firstTouch.clientY);
                 }
                 else if (currentTouches.length === 2) {
-                    var newDistance = computeDistance(currentTouches[0], currentTouches[1]);
+                    var firstTouch = currentTouches[0];
+                    var secondTouch = currentTouches[1];
+                    var newDistance = computeDistance(firstTouch, secondTouch);
                     var deltaDistance = (currentDistance - newDistance);
                     var zoomFactor = deltaDistance / currentDistance;
                     currentDistance = newDistance;
-                    var zoomCenterXClient = 0.5 * (currentTouches[0].clientX + currentTouches[1].clientX);
-                    var zoomCenterYClient = 0.5 * (currentTouches[0].clientY + currentTouches[1].clientY);
+                    var zoomCenterXClient = 0.5 * (firstTouch.clientX + secondTouch.clientX);
+                    var zoomCenterYClient = 0.5 * (firstTouch.clientY + secondTouch.clientY);
                     var zoomCenter = clientToRelative(zoomCenterXClient, zoomCenterYClient);
-                    for (var _a = 0, mouseWheelObservers_2 = mouseWheelObservers; _a < mouseWheelObservers_2.length; _a++) {
-                        var observer = mouseWheelObservers_2[_a];
+                    for (var _b = 0, mouseWheelObservers_2 = mouseWheelObservers; _b < mouseWheelObservers_2.length; _b++) {
+                        var observer = mouseWheelObservers_2[_b];
                         observer(5 * zoomFactor, zoomCenter);
                     }
                 }
@@ -1405,13 +1322,21 @@ var Page;
             var indicatorSpansCache = {};
             var suffix = "-indicator-id";
             function getIndicator(id) {
-                return getElementBySelector("#" + id + suffix);
+                var element = getElementBySelector("#" + id + suffix);
+                if (!element) {
+                    throw new Error("Could not find indicator '".concat(id, "'."));
+                }
+                return element;
             }
             Indicators.getIndicator = getIndicator;
             function getIndicatorSpan(id) {
                 if (!indicatorSpansCache[id]) { // not yet in cache
                     var fullId = id + suffix;
-                    indicatorSpansCache[id] = getElementBySelector("#" + fullId + " span");
+                    var element = getElementBySelector("#" + fullId + " span");
+                    if (!element) {
+                        throw new Error("Could not find indicator span '".concat(id, "'."));
+                    }
+                    indicatorSpansCache[id] = element;
                 }
                 return indicatorSpansCache[id];
             }
