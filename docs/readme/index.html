@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="description" content="Readme page of my project 'Stereogram'. Stereogram (aka Magic Eye) online generator running on GPU with WebGL." />
+    <title>Stereogram - Explanations</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="icon" type="image/png" href="favicon-16x16.png" sizes="16x16">
+    <link rel="icon" type="image/png" href="favicon-32x32.png" sizes="32x32">
+    <link rel="icon" type="image/png" href="favicon-96x96.png" sizes="96x96">
+    <link rel="stylesheet" type="text/css" href="css/page.css?v=2023-04-15T20%3A40%3A26.336Z">
+  </head>
+
+  <body>
+    <header>
+      <a class="logo logo-animate-fill" href="https://piellardj.github.io/stereogram-webgl/" id="seep-live-button" title="Live project" aria-label="Live project">
+        <svg class="logo-icon" xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+          <g stroke-width="2">
+            <path fill="none" stroke-linejoin="round" d="M24,20v24L46,32z" />
+        </svg>
+      </a>
+    </header>
+    <main>
+      <div class="contents">
+        <h1 id="stereogramwebgl">stereogram-webgl</h1>
+        <p>An autostereogram (also known as Magic Eye) is a 2D image designed to create the illusion of 3D. In each image, there is a 3D object that can only be viewed by looking at the image a certain way, as if the screen was transparent and you looked at the wall behind it. It gets easier with practice.</p>
+        <p>Autostereograms were very popular in the '90s. They take advantage of stereopsis: the brain tries to reconstruct depth by combining the two slightly different images perceived by each eye.</p>
+        <p>In this project, you can use your own depth map, customize the tiles as well as the way the image is computed. It all runs on GPU and can also handle live moving scenes in real time.</p>
+        <p>See it live <a href="https://piellardj.github.io/stereogram-webgl/">here</a>.</p>
+        <p>See my Magic Eye solver <a href="https://piellardj.github.io/stereogram-solver/">here</a>.</p>
+        <h2 id="preview">Preview</h2>
+        <p><img src="https://github.com/piellardj/stereogram-webgl/raw/main/src/readme/preview_planet.jpg" alt="Planet" /></p>
+        <p><img src="https://github.com/piellardj/stereogram-webgl/raw/main/src/readme/preview_ship.jpg" alt="Ship" /></p>
+        <p><img src="https://github.com/piellardj/stereogram-webgl/raw/main/src/readme/preview_ripple.jpg" alt="Ripple" /></p>
+        <h2 id="howtoseeastereogramimage">How to see a stereogram image</h2>
+        <h3 id="instructions">Instructions</h3>
+        <p>Seeing the 3D scene hidden in a stereogram image takes a bit of practice. The key is to look beyond the image, and not focus the image itself. There are several techniques to do it:</p>
+        <ul>
+          <li>if you are able to, just consciously relax your eyes like if you were looking in the distance</li>
+          <li>another technique is to start with your head very close to the screen, so close that you cannot focus it. At this point your eyes should naturally look in the distance. Then move your head back slowly, and don't look at the screen: try to keep your eyes looking in the vague</li>
+          <li>another one is to use an object like a pen: place it behind your screen, on the side so you can see it. Keep staring at it, and move it slowly towards the center of the screen. This should help you look beyond the screen.</li>
+        </ul>
+        <p>If you cannot quite see a clear 3D object but you still feel something weird, you are certainly on good track.</p>
+        <h3 id="exercises">Exercises</h3>
+        <p>Below are images you can practice on while training. For each of them, you need to have the correct way of looking at them.</p>
+        <div style="text-align:center">
+          <img alt="First practice image" src="https://github.com/piellardj/stereogram-webgl/raw/main/src/readme/tutorial_easy.png" />
+          <p>
+            <i>Try to relax your eyes, and you should see a third black dot appear in the middle.</i>
+          </p>
+        </div>
+        <div style="text-align:center">
+          <img alt="Second practice image" src="https://github.com/piellardj/stereogram-webgl/raw/main/src/readme/tutorial_medium.png" />
+          <p>
+            <i>Practice your look on this image, and you should see each row float at a different depth: the daisies look far away, the red flowers are a bit closer, then the blue butterfly, and finally the yellow flowers are the closest.</i>
+          </p>
+        </div>
+        <div style="text-align:center">
+          <img alt="Last practice image" src="https://github.com/piellardj/stereogram-webgl/raw/main/src/readme/tutorial_hard.jpg" />
+          <p>
+            <i>This is the last practice image. If you look at it correctly, you should clearly see a 3D object.</i>
+          </p>
+        </div>
+        <h2 id="howdoesitwork">How does it work</h2>
+        <h3 id="baseidea">Base idea</h3>
+        <p>The brain perceives depth by combining the two slightly different images coming from our eyes. If an object looks exactly the same from both eyes, it means the object is far in the distance. On the contrary, if an object looks very different from each eye, it means the eyes each have a different perspective on it, so the object must be very close.</p>
+        <p>Since depth perception is based on binocular vision, if we want the show a 3D object in our 2D image, we must trick the brain into thinking each eye sees a different perspective of our 3D object. If you look directly at the image, it does not work: the brain clearly sees the image is 2D. So the viewer has to focus a point either before the image, or behind it.</p>
+        <p>Now, we must understand how to build the image. Let's see what happens if someones looks at an object through a transparent screen:</p>
+        <div style="text-align:center">
+          <img alt="Depth creates repetition" src="https://github.com/piellardj/stereogram-webgl/raw/main/src/readme/diagram-01.png" />
+          <p>
+            <i>As you can see, there are two "ghosts" of the object on the screen, because of the eyes having different positions relatively to the object.</i>
+          </p>
+        </div>
+        <p>Now let's compare two situations: one object is near and the other is far away:</p>
+        <div style="text-align:center">
+          <img alt="Repetition period vary with distance" src="https://github.com/piellardj/stereogram-webgl/raw/main/src/readme/diagram-02.png" />
+          <p>
+            <i>The closer an object is to the screen, the closer its ghosts are on the screen.</i>
+          </p>
+        </div>
+        <p>In conclusion, provided the viewer does not look directly at the image but beyond it, if we repeat some pattern on the image, the brain will interpret it as the pattern actually being behind the screen. Moreover, by changing the frequency of the repetitions, we can create an impression of relative depth: a pattern with close repetitions will appear closer than a pattern with distanced repetitions. This explains why on the image below, the daisies appear further away than the butterflies.</p>
+        <div style="text-align:center">
+          <img alt="Depth perception and repetition frequency" src="https://github.com/piellardj/stereogram-webgl/raw/main/src/readme/tutorial_medium.png" />
+          <p>
+            <i>When looking beyond this image, the daisies appear further away than the butterflies because of the difference in repetition frequency.</i>
+          </p>
+        </div>
+        <p>Another interesting property is that only one repetition is needed to perceive depth. This means that on a same row, we can vary the perceived depth by changing the frequency of the repetitions, creating a slope effect.</p>
+        <div style="text-align:center">
+          <img alt="We can change depth on a single row" src="https://github.com/piellardj/stereogram-webgl/raw/main/src/readme/frequency-change.png" />
+          <p>
+            <i>On each row, the repetition frequency varies. This gives the perception of depth variation on each row.</i>
+          </p>
+        </div>
+        <h3 id="algorithm">Algorithm</h3>
+        <p>We want to generate an autostereogram given the following inputs:</p>
+        <ul>
+          <li>a depth map encoded as a black and white image, in this example a sphere;</li>
+          <li>a base pattern, in this example a seamless clouds texture.</li>
+        </ul>
+        <p>Since this is all about repetition, let's define our base repetition period in pixels. Then let's split our target image into vertical stripes, each having the repetition period as width.</p>
+        <div style="text-align:center">
+          <img alt="Image split in stripes" src="https://github.com/piellardj/stereogram-webgl/raw/main/src/readme/demo_stripes_empty.png" />
+          <p>
+            <i>Target image split into 5 vertical stripes, plus the reference stripe on the left.</i>
+          </p>
+        </div>
+        <p>Since this is all about repetition, let's make each stripe a repetition of the previous one. The far-left stripe serves as reference:</p>
+        <div style="text-align:center">
+          <img alt="Repetition without displacement" src="https://github.com/piellardj/stereogram-webgl/raw/main/src/readme/demo_stripes.png" />
+          <p>
+            <i>By repeating the first stripe without displacement, the viewer only perceives a flat surface.</i>
+          </p>
+        </div>
+        <p>Now we want to make it 3D, so let's introduce horizontal displacement: each stripe will be a displaced version of the previous one. Each pixel has a distinct local displacement, given by sampling the depth map at that position. Since the far-left stripe is the first one, it does not have a reference so it will not be deformed. However I do not want to truncate the depth map, so just scale it down and shift it to the right so that all of it is sampled.</p>
+        <div style="text-align:center">
+          <img alt="Repetition with displacement" src="https://github.com/piellardj/stereogram-webgl/raw/main/src/readme/demo_final.png" />
+          <p>
+            <i>By repeating the first stripe and adding with displacement, the viewer perceives the 3D objects.</i>
+          </p>
+        </div>
+        <p>In the end, every pixel on the image is a displaced version of the source stripe. Here is an illustration to better see the displacement:</p>
+        <div style="text-align:center">
+          <img alt="Repetition with displacement" src="https://github.com/piellardj/stereogram-webgl/raw/main/src/readme/demo_uv.png" />
+          <p>
+            <i>By displaying the UV coordinates the tile will be sampled at, the displacement is more visible. One can clearly see the sphere-shaped displacement sampled from the depth map.</i>
+          </p>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <div class="badge-shelf">
+        <a class="badge" href="mailto:jeremie.piellard@gmail.com" title="Email">
+          <svg xmlns="http://www.w3.org/2000/svg" width="32px" height="32px" viewBox="0 0 512 512">
+            <path d="M512 85V448H0V85l256 224L512 85zM488 64H24L256 267 488 64z" />
+          </svg>
+        </a>
+
+        <a class="badge" href="https://github.com/piellardj" title="GitHub">
+          <svg xmlns="http://www.w3.org/2000/svg" width="32px" height="32px" viewBox="0 0 1024 1024">
+            <path d="M512 0C229 0 0 229 0 512c0 226 147 418 350 486 26 5 35-11 35-25 0-12 0-53-1-95C242 909 212 818 212 818c-23-59-57-75-57-75-47-32 4-31 4-31 51 4 78 53 78 53 46 78 120 56 149 43 5-33 18-56 33-68C305 725 185 682 185 485c0-56 20-102 53-137-5-13-23-65 5-136 0 0 43-14 141 53 41-11 85-17 128-17 44 0 87 6 128 17 98-66 141-52 141-52 28 71 10 123 5 136 33 36 53 81 53 137 0 197-120 240-234 253 18 16 35 47 35 95 0 68-1 124-1 141 0 14 9 30 35 25C877 930 1024 738 1024 512 1024 229 795 0 512 0z" />
+          </svg>
+        </a>
+
+        <a class="badge" href="https://www.linkedin.com/in/jeremie-piellard/" title="LinkedIn">
+          <svg xmlns="http://www.w3.org/2000/svg" width="32px" height="32px" viewBox="0 0 512 512">
+            <path d="M30 177l93-1v304l-93 1v-304z" />
+            <path d="M200 177l89-1v39l0 11c26-26 53-45 97-45 51 0 100 21 100 91v208l-90 1v-159c0-35-9-58-51-58-37 0-52 7-52 55v160l-92 1v-304z" />
+            <path d="M128 81c0 28-23 51-51 51s-51-23-51-51c0-28 23-51 51-51 28 0 51 23 51 51z" />
+          </svg>
+        </a>
+      </div>
+    </footer>
+  </body>
+
+</html>
