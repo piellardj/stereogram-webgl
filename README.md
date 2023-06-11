@@ -9,6 +9,8 @@ See it live [here](https://piellardj.github.io/stereogram-webgl/).
 
 See my Magic Eye solver [here](https://piellardj.github.io/stereogram-solver/).
 
+[![Donate](https://raw.githubusercontent.com/piellardj/piellardj.github.io/master/images/readme/donate-paypal.svg)](https://www.paypal.com/donate/?hosted_button_id=AF7H7GEJTL95E)
+
 ## Preview
 
 ![Planet](src/readme/preview_planet.jpg)
