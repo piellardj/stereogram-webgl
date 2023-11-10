@@ -31,25 +31,25 @@ If you cannot quite see a clear 3D object but you still feel something weird, yo
 ### Exercises
 Below are images you can practice on while training. For each of them, you need to have the correct way of looking at them.
 
-<div style="text-align:center">
-    <img alt="First practice image" src="src/readme/tutorial_easy.png"/>
+<div style="text-align:center;margin:48px 0">
     <p>
         <i>Try to relax your eyes, and you should see a third black dot appear in the middle.</i>
     </p>
+    <img alt="First practice image" src="src/readme/tutorial_easy.png"/>
 </div>
 
-<div style="text-align:center">
-    <img alt="Second practice image" src="src/readme/tutorial_medium.png"/>
+<div style="text-align:center;margin:48px 0">
     <p>
         <i>Practice your look on this image, and you should see each row float at a different depth: the daisies look far away, the red flowers are a bit closer, then the blue butterfly, and finally the yellow flowers are the closest.</i>
     </p>
+    <img alt="Second practice image" src="src/readme/tutorial_medium.png"/>
 </div>
 
-<div style="text-align:center">
-    <img alt="Last practice image" src="src/readme/tutorial_hard.jpg"/>
+<div style="text-align:center;margin:48px 0">
     <p>
         <i>This is the last practice image. If you look at it correctly, you should clearly see a 3D object.</i>
     </p>
+    <img alt="Last practice image" src="src/readme/tutorial_hard.jpg"/>
 </div>
 
 ## How does it work
