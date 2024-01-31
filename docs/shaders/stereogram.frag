@@ -14,7 +14,6 @@ uniform float uInvertHeightmap;
 uniform vec2 uHeightmapScaling;
 
 float sampleHeightmap(vec2 position) {
-    position.y = 1.0 - position.y;
     position = 0.5 + (position - 0.5) * uHeightmapScaling;
 
     if (position.x >= 0.0 && position.x <= 1.0 && position.y >= 0.0 && position.y <= 1.0) {
@@ -43,7 +42,7 @@ vec2 originalPosition(vec2 position) {
 }
 
 vec4 sampleTile(vec2 coords) {
-    coords = 0.5 + (coords - 0.5) * uTileScaling * vec2(1,-1);
+    coords = 0.5 + (coords - 0.5) * uTileScaling;
     return texture2D(uTileTexture, coords);
 }
 

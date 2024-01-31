@@ -27,7 +27,7 @@ vec2 originalPosition(vec2 position) {
 }
 
 vec4 sampleTile(vec2 coords) {
-    coords = 0.5 + (coords - 0.5) * uTileScaling * vec2(1,-1);
+    coords = 0.5 + (coords - 0.5) * uTileScaling;
     return texture2D(uTileTexture, coords);
 }
 

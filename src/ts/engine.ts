@@ -53,7 +53,7 @@ class Engine {
                 shader.u["uTileTexture"].value = currentTile.texture.id;
                 shader.u["uTileColor"].value = (Parameters.tileMode === ETileMode.NOISE && !Parameters.noiseTileColored) ? 0 : 1;
                 shader.u["uTileHeight"].value = tileHeight;
-                shader.u["uTileScaling"].value = [tileUsefulWidth / currentTile.texture.width, tileUsefulHeight / currentTile.texture.height];
+                shader.u["uTileScaling"].value = [tileUsefulWidth / currentTile.texture.width, -tileUsefulHeight / currentTile.texture.height];
                 shader.u["uShowUV"].value = Parameters.showUV ? 1 : 0;
             }
         }
@@ -71,9 +71,9 @@ class Engine {
             const canvasAspectRatio = (gl.canvas.width * usefulStripesProportion) / gl.canvas.height;
             const heightmapAspectRatio = heightmapTexture.width / heightmapTexture.height;
             if (canvasAspectRatio > heightmapAspectRatio) {
-                shader.u["uHeightmapScaling"].value = [canvasAspectRatio / heightmapAspectRatio / heightmapHScaling, 1];
+                shader.u["uHeightmapScaling"].value = [canvasAspectRatio / heightmapAspectRatio / heightmapHScaling, -1];
             } else {
-                shader.u["uHeightmapScaling"].value = [1 / heightmapHScaling, heightmapAspectRatio / canvasAspectRatio];
+                shader.u["uHeightmapScaling"].value = [1 / heightmapHScaling, -heightmapAspectRatio / canvasAspectRatio];
             }
 
             shader.use();
