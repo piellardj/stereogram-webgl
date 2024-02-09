@@ -11,7 +11,7 @@
     "build-shaders": "node src/build-shaders.js",
     "build": "npm run build-page && npm run build-shaders && npm run webpack",
     "clean": "shx rm -rf docs/* **/*generated.*",
-    "lint": "tslint -c src/config/tslint.json -p src/config/tsconfig.json",
+    "lint": "tslint -c src/config/tslint.json -p src/config/tsconfig.json --fix",
     "rebuild": "npm run clean && npm run build",
     "webpack": "webpack --config src/config/webpack.config.js"
   },

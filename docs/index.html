@@ -11,7 +11,7 @@
     <link rel="icon" type="image/png" href="favicon-16x16.png" sizes="16x16">
     <link rel="icon" type="image/png" href="favicon-32x32.png" sizes="32x32">
     <link rel="icon" type="image/png" href="favicon-96x96.png" sizes="96x96">
-    <link rel="stylesheet" type="text/css" href="css/page.css?v=2024-01-31T17%3A37%3A45.877Z">
+    <link rel="stylesheet" type="text/css" href="css/page.css?v=2024-02-09T22%3A06%3A51.331Z">
   </head>
 
   <body>
@@ -261,11 +261,13 @@
             <h2>Stripes</h2>
 
             <div class="controls-list">
-              <div class="control" id="control-show-uv-checkbox-id">
-                <label>Show UV:</label>
-                <div class="checkbox">
-                  <input type="checkbox" id="show-uv-checkbox-id">
-                  <label for="show-uv-checkbox-id" class="checkmark"></label>
+              <div class="control" id="control-main-stripe-tabs-id">
+                <label>Main stripe:</label>
+                <div class="tabs compact" id="main-stripe-tabs-id-id">
+                  <input type="radio" name="main-stripe-tabs-id" value="left" id="main-stripe-tabs-id-left-id" />
+                  <label for="main-stripe-tabs-id-left-id">Left</label>
+                  <input type="radio" name="main-stripe-tabs-id" value="middle" id="main-stripe-tabs-id-middle-id" checked />
+                  <label for="main-stripe-tabs-id-middle-id">Middle (beta)</label>
                 </div>
               </div>
               <div class="control" id="control-stripes-mode-tabs-id">
@@ -325,6 +327,13 @@
                   </div>
                 </div>
               </div>
+              <div class="control" id="control-show-uv-checkbox-id">
+                <label>Show UV:</label>
+                <div class="checkbox">
+                  <input type="checkbox" id="show-uv-checkbox-id">
+                  <label for="show-uv-checkbox-id" class="checkmark"></label>
+                </div>
+              </div>
             </div>
           </section>
           <hr />
@@ -382,13 +391,13 @@
     <script type="text/javascript">
       var Page = Page || {};
       Object.defineProperty(Page, "version", {
-        value: "2024-01-31T17%3A37%3A45.877Z",
+        value: "2024-02-09T22%3A06%3A51.331Z",
         writable: false,
       });
     </script>
-    <script src="script/page.min.js?v=2024-01-31T17%3A37%3A45.877Z"></script>
-    <script src="script/gl-matrix-2.5.1-min.js?v=2024-01-31T17%3A37%3A45.877Z"></script>
-    <script src="script/main.min.js?v=2024-01-31T17%3A37%3A45.877Z"></script>
+    <script src="script/page.min.js?v=2024-02-09T22%3A06%3A51.331Z"></script>
+    <script src="script/gl-matrix-2.5.1-min.js?v=2024-02-09T22%3A06%3A51.331Z"></script>
+    <script src="script/main.min.js?v=2024-02-09T22%3A06%3A51.331Z"></script>
   </body>
 
 </html>

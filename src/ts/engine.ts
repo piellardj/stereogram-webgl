@@ -3,7 +3,7 @@ import { Shader } from "./gl-utils/shader";
 import { VBO } from "./gl-utils/vbo";
 
 import { Heightmap } from "./heightmap";
-import { EStripesMode, ETileMode, Parameters } from "./parameters";
+import { EMainStripe, EStripesMode, ETileMode, Parameters } from "./parameters";
 import * as StereogramShader from "./stereogram-shader";
 import { ImageTexture } from "./texture/image-texture";
 import { Tile } from "./tile";
@@ -28,17 +28,16 @@ class Engine {
         asyncLoadShader("heightmap", "fullscreen.vert", "heightmap.frag", (shader: Shader) => {
             this.heightmapShader = shader;
         });
-        asyncLoadShader("creds", "fullscreen.vert", "copy-texture.frag", shader => {
+        asyncLoadShader("creds", "fullscreen.vert", "copy-texture.frag", (shader: Shader) => {
             this.watermarkShader = shader;
-        })
+        });
 
         const credImage = new Image();
         const uploadCred = () => {
             this.watermarkTexture.uploadToGPU(credImage);
-            console.log(this.watermarkTexture.width + " ; " + this.watermarkTexture.height);
         };
         credImage.addEventListener("load", uploadCred);
-        credImage.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASwAAAAUCAMAAAAA/fAzAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJUExURQAAAP///wAAAHPGg3EAAAADdFJOU///ANfKDUEAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAKFSURBVFhH7VSLjhsxCEzy/x999jwA492k2Yvaq3SjGJgBbJarenv84o/xu6w38POXdbv9mBm3Qdpsg4Lb71DmLL/oqjUaBbo0a45v/jwOnlqko2TRQAe336EM7Q7pTIJkVaNAl8BTKeHnsT4FrBIDaiN2sLhE13sBLpsQP8FpmxPyFO4kBa6Le6J+9YGNC6Ide7/KYSrabHdx+x3KTIsrByAIS1+7xVRt6KsVm/Ap5HMLDj4SEsuxLKpncP/5zCWjS3ec3GJ62tc7Wv+ncXD9lDielzX2x63etdzh1Yhi+dBRz2BEqfNO60OhjDQDqEqRQnej6PQMyruzni7ywzhYdKj+ZX7SYWcBwTJkWEbmBKJxMF0sCwnkaNOw2CwML6phFE60EluKSPKgZp4JNoM1kyFp4RTMq+fdUFLHCqgBqFnywUsrdxX/Z6nIdi66FssrEUzFCO2AoldLXw5kmAlsK6Wa9DiFLnOIu8beec/tHyjz2J35lMDlZbGq82UhBBymPo3UFMMBRa+WvhzIMIGUpqm5wkNuHH4YeyeKzp/hZQWlsbfFrq4sa/mLzlNis6KnbQd/SfO4RcxG6sLHkRyBObzyeXfy+Bl9WTMQ10S067Lwr5Celad+nKDmCGntMMRaKFkRcmLgdBTsIKaMqAhyGRQ+mydNDsJEQCxz45AjQb0sC8lpvoftig/difmu4On7/PqnqP0sZ4v2eRnaf2ITnkJTHw9fvunF1xW8eh8f/2RbrV/VtSPCV17YHqPQ1SjMxFqiGXKUmsaUEcrDBQ77Cno9biLE4M7hYphFeh/qbyMMiF7G1Sv4+vX31d77yY8y7wD99YJN+Mv47vvH/f/wg/43PB5frhkVzqJiDtMAAAAASUVORK5CYII="
+        credImage.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASwAAAAUCAMAAAAA/fAzAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJUExURQAAAP///wAAAHPGg3EAAAADdFJOU///ANfKDUEAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAKFSURBVFhH7VSLjhsxCEzy/x999jwA492k2Yvaq3SjGJgBbJarenv84o/xu6w38POXdbv9mBm3Qdpsg4Lb71DmLL/oqjUaBbo0a45v/jwOnlqko2TRQAe336EM7Q7pTIJkVaNAl8BTKeHnsT4FrBIDaiN2sLhE13sBLpsQP8FpmxPyFO4kBa6Le6J+9YGNC6Ide7/KYSrabHdx+x3KTIsrByAIS1+7xVRt6KsVm/Ap5HMLDj4SEsuxLKpncP/5zCWjS3ec3GJ62tc7Wv+ncXD9lDielzX2x63etdzh1Yhi+dBRz2BEqfNO60OhjDQDqEqRQnej6PQMyruzni7ywzhYdKj+ZX7SYWcBwTJkWEbmBKJxMF0sCwnkaNOw2CwML6phFE60EluKSPKgZp4JNoM1kyFp4RTMq+fdUFLHCqgBqFnywUsrdxX/Z6nIdi66FssrEUzFCO2AoldLXw5kmAlsK6Wa9DiFLnOIu8beec/tHyjz2J35lMDlZbGq82UhBBymPo3UFMMBRa+WvhzIMIGUpqm5wkNuHH4YeyeKzp/hZQWlsbfFrq4sa/mLzlNis6KnbQd/SfO4RcxG6sLHkRyBObzyeXfy+Bl9WTMQ10S067Lwr5Celad+nKDmCGntMMRaKFkRcmLgdBTsIKaMqAhyGRQ+mydNDsJEQCxz45AjQb0sC8lpvoftig/difmu4On7/PqnqP0sZ4v2eRnaf2ITnkJTHw9fvunF1xW8eh8f/2RbrV/VtSPCV17YHqPQ1SjMxFqiGXKUmsaUEcrDBQ77Cno9biLE4M7hYphFeh/qbyMMiF7G1Sv4+vX31d77yY8y7wD99YJN+Mv47vvH/f/wg/43PB5frhkVzqJiDtMAAAAASUVORK5CYII=";
         uploadCred();
     }
 
@@ -70,6 +69,7 @@ class Engine {
                 shader.u["uTileHeight"].value = tileHeight;
                 shader.u["uTileScaling"].value = [tileUsefulWidth / currentTile.texture.width, -tileUsefulHeight / currentTile.texture.height];
                 shader.u["uShowUV"].value = Parameters.showUV ? 1 : 0;
+                shader.u["uMainStripe"].value = (Parameters.mainStripe === EMainStripe.LEFT) ? 0 : Math.floor(this.stripesCount / 2);
             }
         }
 
@@ -100,7 +100,7 @@ class Engine {
 
         let drewWatermark = false;
         if (this.watermarkShader && this.watermarkTexture.width > 0) {
-            let left = Math.max(0, (gl.canvas.width - this.watermarkTexture.width) / 2);
+            const left = Math.max(0, (gl.canvas.width - this.watermarkTexture.width) / 2);
             gl.viewport(left, gl.canvas.height - this.watermarkTexture.height, this.watermarkTexture.width, this.watermarkTexture.height);
             this.watermarkShader.a["aCorner"].VBO = this.fullscreenVBO;
             this.watermarkShader.u["uTexture"].value = this.watermarkTexture.id;

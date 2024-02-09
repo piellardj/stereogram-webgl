@@ -264,10 +264,21 @@ const data = {
             title: "Stripes",
             controls: [
                 {
-                    type: Demopage.supportedControls.Checkbox,
-                    title: "Show UV",
-                    id: "show-uv-checkbox-id",
-                    checked: false,
+                    type: Demopage.supportedControls.Tabs,
+                    title: "Main stripe",
+                    id: "main-stripe-tabs-id",
+                    unique: true,
+                    options: [
+                        {
+                            value: "left",
+                            label: "Left",
+                        },
+                        {
+                            value: "middle",
+                            label: "Middle (beta)",
+                            checked: true,
+                        },
+                    ]
                 },
                 {
                     type: Demopage.supportedControls.Tabs,
@@ -303,6 +314,12 @@ const data = {
                     max: 24,
                     value: 16,
                     step: 1
+                },
+                {
+                    type: Demopage.supportedControls.Checkbox,
+                    title: "Show UV",
+                    id: "show-uv-checkbox-id",
+                    checked: false,
                 },
             ]
         },

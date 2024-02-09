@@ -21,6 +21,7 @@ const controlId = {
     SHOW_HEIGHTMAP: "show-heightmap-checkbox-id",
     HEIGHTMAP_UPLOAD_BUTTON: "input-heightmap-upload-button",
 
+    STRIPES_MAIN_TABS: "main-stripe-tabs-id",
     STRIPES_MODE_TABS: "stripes-mode-tabs-id",
     STRIPES_WIDTH_RANGE: "stripes-width-range-id",
     STRIPES_COUNT_RANGE: "stripes-count-range-id",
@@ -55,6 +56,11 @@ enum ETileMode {
 enum EHeightmapMode {
     STILL = "still",
     MOVING = "moving",
+}
+
+enum EMainStripe {
+    LEFT = "left",
+    MIDDLE = "middle",
 }
 
 enum EStripesMode {
@@ -103,6 +109,9 @@ abstract class Parameters {
         return Page.Checkbox.isChecked(controlId.SHOW_HEIGHTMAP);
     }
 
+    public static get mainStripe(): EMainStripe {
+        return Page.Tabs.getValues(controlId.STRIPES_MAIN_TABS)[0] as EMainStripe;
+    }
     public static get stripesMode(): EStripesMode {
         return Page.Tabs.getValues(controlId.STRIPES_MODE_TABS)[0] as EStripesMode;
     }
@@ -243,6 +252,7 @@ Page.Checkbox.addObserver(controlId.TILE_NOISE_COLORED, callRecomputeNoiseTileOb
         updateStripesControlsVisibility();
         callRedrawObservers();
     };
+    Page.Tabs.addObserver(controlId.STRIPES_MAIN_TABS, onStripesChange);
     Page.Tabs.addObserver(controlId.STRIPES_MODE_TABS, onStripesChange);
     Page.Range.addObserver(controlId.STRIPES_COUNT_RANGE, onStripesChange);
     Page.Range.addObserver(controlId.STRIPES_WIDTH_RANGE, onStripesChange);
@@ -266,6 +276,7 @@ updateControlsVisibility();
 export {
     EHeightmapMode,
     EStripesMode,
+    EMainStripe,
     ETileMode,
     Parameters,
 };
