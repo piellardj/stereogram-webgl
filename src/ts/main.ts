@@ -73,7 +73,7 @@ function main(): void {
         }
 
         if (needToRedraw) {
-            GLCanvas.adjustSize(false);
+            GLCanvas.adjustSize(true);
             needToRedraw = !engine.draw(heightmap, tile);
         }
 

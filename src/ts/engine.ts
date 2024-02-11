@@ -1,6 +1,7 @@
 import { gl } from "./gl-utils/gl-canvas";
 import { Shader } from "./gl-utils/shader";
 import { VBO } from "./gl-utils/vbo";
+import { Viewport } from "./gl-utils/viewport";
 
 import { Heightmap } from "./heightmap";
 import { EMainStripe, EStripesMode, ETileMode, Parameters } from "./parameters";
@@ -60,9 +61,9 @@ class Engine {
                 const tileUsefulWidth = currentTile.texture.width - 2 * currentTile.padding;
                 const tileUsefulHeight = currentTile.texture.height - 2 * currentTile.padding;
 
-                const tileWidthInPixel = gl.canvas.width / (this.stripesCount + 1);
+                const tileWidthInPixel = this.canvasWidth / (this.stripesCount + 1);
                 const tileHeightInPixel = tileWidthInPixel / (tileUsefulWidth / tileUsefulHeight);
-                const tileHeight = tileHeightInPixel / gl.canvas.height;
+                const tileHeight = tileHeightInPixel / this.canvasHeight;
 
                 shader.u["uTileTexture"].value = currentTile.texture.id;
                 shader.u["uTileColor"].value = (Parameters.tileMode === ETileMode.NOISE && !Parameters.noiseTileColored) ? 0 : 1;
@@ -76,7 +77,7 @@ class Engine {
         let drewStereogram = false;
         if (shader) {
             gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-            gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+            Viewport.setFullCanvas(gl);
             gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT); // tslint:disable-line:no-bitwise
 
             shader.a["aCorner"].VBO = this.fullscreenVBO;
@@ -84,7 +85,7 @@ class Engine {
             shader.u["uInvertHeightmap"].value = Parameters.invertHeightmap;
             shader.u["uDepthFactor"].value = Parameters.depth;
 
-            const canvasAspectRatio = (gl.canvas.width * usefulStripesProportion) / gl.canvas.height;
+            const canvasAspectRatio = this.canvasWidth / this.canvasHeight * usefulStripesProportion;
             const heightmapAspectRatio = heightmapTexture.width / heightmapTexture.height;
             if (canvasAspectRatio > heightmapAspectRatio) {
                 shader.u["uHeightmapScaling"].value = [canvasAspectRatio / heightmapAspectRatio / heightmapHScaling, -1];
@@ -100,8 +101,10 @@ class Engine {
 
         let drewWatermark = false;
         if (this.watermarkShader && this.watermarkTexture.width > 0) {
-            const left = Math.max(0, (gl.canvas.width - this.watermarkTexture.width) / 2);
-            gl.viewport(left, gl.canvas.height - this.watermarkTexture.height, this.watermarkTexture.width, this.watermarkTexture.height);
+            const watermarkWidth = this.watermarkTexture.width * window.devicePixelRatio;
+            const watermarkHeight = this.watermarkTexture.height * window.devicePixelRatio;
+            const left = Math.max(0, (gl.canvas.width - watermarkWidth) / 2);
+            gl.viewport(left, gl.canvas.height - watermarkHeight, watermarkWidth, watermarkHeight);
             this.watermarkShader.a["aCorner"].VBO = this.fullscreenVBO;
             this.watermarkShader.u["uTexture"].value = this.watermarkTexture.id;
             this.watermarkShader.use();
@@ -115,15 +118,23 @@ class Engine {
 
     private computeIdealStripeCount(): number {
         if (Parameters.stripesMode === EStripesMode.ADAPTATIVE) {
-            const idealCount = Math.round(gl.canvas.width / Parameters.stripesWidth);
+            const idealCount = Math.round(this.canvasWidth / Parameters.stripesWidth);
             return clamp(Engine.MIN_STRIPES_COUNT, Engine.MAX_STRIPES_COUNT, idealCount);
         } else {
             return Parameters.stripesCount;
         }
     }
+
+    private get canvasWidth(): number {
+        return gl.canvas.width / window.devicePixelRatio;
+    }
+
+    private get canvasHeight(): number {
+        return gl.canvas.height / window.devicePixelRatio;
+    }
 }
 
 export {
-    Engine,
+    Engine
 };
 

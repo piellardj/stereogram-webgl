@@ -13,7 +13,8 @@
     "clean": "shx rm -rf docs/* **/*generated.*",
     "lint": "tslint -c src/config/tslint.json -p src/config/tsconfig.json --fix",
     "rebuild": "npm run clean && npm run build",
-    "webpack": "webpack --config src/config/webpack.config.js"
+    "webpack": "webpack --config src/config/webpack.config.js",
+    "webpack:watch": "webpack --config src/config/webpack.config.js --watch"
   },
   "engines": {
     "node": ">=18.16.0"
